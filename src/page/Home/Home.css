@@ -1,0 +1,14 @@
+.name-container {
+    width: 100vh;
+    height: 100px;
+  
+    margin: 0 auto;
+  }
+  
+  .name-box {
+    text-align: center;
+    width: inherit;
+    height: inherit;
+    display: table-cell;
+    vertical-align: middle;
+  }
