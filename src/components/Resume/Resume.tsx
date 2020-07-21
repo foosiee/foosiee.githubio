@@ -4,8 +4,11 @@ import StyledLink from '../StyledLink/StyledLink';
 import Container from '@material-ui/core/Container';
 import ColoredText from '../ColoredText/ColoredText';
 import {AiFillLinkedin, AiFillGithub} from 'react-icons/ai';
+import Project from '../Project/Project';
+import {SpotifyLyrics, SupaMarketMetrics, VNetLab, AutomatedDocumentProcessor} from '../../objects/Projects';
 
 import './Resume.css';
+import Spacer from '../Spacer/Spacer';
 
 export default function Resume() {
   const email = 'colefoos27@hotmail.com';
@@ -66,6 +69,47 @@ export default function Resume() {
             <li>Regent Scholarship Award</li>
           </ul>
         </Grid>
+
+        <Grid item xs={12}>
+          <h4><ColoredText color="#50fa7b">Skills</ColoredText></h4>
+            <div style={{display: 'inline-flex'}}>
+              <ul>
+                <li>Python</li>
+                <li>React</li>
+                <li>Java</li>
+                <li>Amazon Web Services</li>
+              </ul>
+              <ul>
+                <li>Typescript</li>
+                <li>Angular</li>
+                <li>C#</li>
+                <li>Google Cloud Platform</li>
+              </ul>
+            </div>
+        </Grid>
+
+        <Grid item xs={12}>
+          <h4><ColoredText color="#50fa7b">Projects</ColoredText></h4>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <Project title={SpotifyLyrics.title} link={SpotifyLyrics.link} description={SpotifyLyrics.description}/>
+            </Grid>
+            <Grid item xs={6}>
+              <Project title={SupaMarketMetrics.title} link={SupaMarketMetrics.link} description={SupaMarketMetrics.description} />
+            </Grid>
+            <Grid item xs={6}>
+              <Project title={VNetLab.title} link={VNetLab.link} description={VNetLab.description}/>
+            </Grid>
+            <Grid item xs={6}>
+              <Project title={AutomatedDocumentProcessor.title} link={AutomatedDocumentProcessor.link} description={AutomatedDocumentProcessor.description} />
+            </Grid>
+          </Grid>
+        </Grid>
+        
+        <Grid item xs={12}>
+          <Spacer amount={20}/>
+        </Grid>
+
       </Grid>
     </Container>
   )
