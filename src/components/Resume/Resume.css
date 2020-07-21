@@ -10,3 +10,32 @@
 .pad {
     margin: 10px;
 }
+
+.linkedIn {
+    fill: #f8f8f2;
+}
+
+.linkedIn:hover {
+    fill: #0073b1;
+}
+
+.github {
+    fill: #f8f8f2;
+}
+
+.github:hover {
+    fill: lightgray;
+}
+
+p, li {
+    color: #f8f8f2; 
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 5;
+}
+
+.socal-link {
+    text-decoration: none !important;
+}

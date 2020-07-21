@@ -1,6 +1,7 @@
 body {
   background-color: #282a36;
   margin: 0;
+  overflow: auto;
   font-family: Monaco, Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

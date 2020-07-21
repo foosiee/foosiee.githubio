@@ -7,6 +7,7 @@ import Collapse from '@material-ui/core/Collapse';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Resume from '../../components/Resume/Resume';
+import Skills from '../../components/Skills/Skills';
 
 import './Home.css';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
@@ -44,11 +45,11 @@ export default function Home() {
         <Grid item xs={12}>
           <Introduction />
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={12}>
           <Resume />
         </Grid>
-        <Grid item xs={3}>
-          <Paper className={classes.paper}>xs=3</Paper>
+        <Grid item xs={2}>
+          <Skills />
         </Grid>
         <Grid item xs={3}>
           <Paper className={classes.paper}>xs=3</Paper>

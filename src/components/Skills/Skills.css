@@ -1,0 +1,12 @@
+.border {
+    border: 2px solid #8be9fd;
+    border-radius: 8px;
+}
+
+.regular-text {
+    color: #f8f8f2;
+}
+
+img {
+    vertical-align: middle;
+}
