@@ -29,8 +29,8 @@ export default function Resume() {
 
         <Grid item xs={6}>
           <div style={{display: 'inline-block'}}><p>Socials:    
-            <a href={linkedInAddress} target="_blank" className="social-link"><AiFillLinkedin style={{verticalAlign: 'text-bottom'}} className="linkedIn" size="1.5em"/></a>
-            <a href={githubAddress} target="_blank" className="social-link"><AiFillGithub style={{verticalAlign: 'text-bottom'}} className="github" size="1.5em"/></a>
+            <a href={linkedInAddress} target="_blank" rel="noopener noreferrer" className="social-link"><AiFillLinkedin style={{verticalAlign: 'text-bottom'}} className="linkedIn" size="1.5em"/></a>
+            <a href={githubAddress} target="_blank" rel="noopener noreferrer" className="social-link"><AiFillGithub style={{verticalAlign: 'text-bottom'}} className="github" size="1.5em"/></a>
             </p></div>
         </Grid>
 
@@ -105,11 +105,10 @@ export default function Resume() {
             </Grid>
           </Grid>
         </Grid>
-        
-        <Grid item xs={12}>
-          <Spacer amount={20}/>
-        </Grid>
 
+        <Grid item xs={12}>
+          <Spacer amount={10} />
+        </Grid>
       </Grid>
     </Container>
   )

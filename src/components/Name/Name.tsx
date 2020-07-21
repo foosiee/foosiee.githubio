@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Subscription, { timer, Subject } from 'rxjs';
+import { timer, Subject } from 'rxjs';
 import { map, takeWhile, takeUntil } from 'rxjs/operators';
 
 import './Name.css'
