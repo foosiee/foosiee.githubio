@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { TextareaAutosize, Grid, Button } from '@material-ui/core';
+import { TextareaAutosize, Grid } from '@material-ui/core';
 import StyledButton from '../StyledButton/StyledButton';
 import ColoredText from '../ColoredText/ColoredText';
 
