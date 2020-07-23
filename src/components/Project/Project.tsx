@@ -39,7 +39,6 @@ export default function Project(props: {
 
   const addWhiteSpace = (text: string) => {
     const difference = maxTextLength - text.length;
-    console.log(difference);
     if (difference > 0) {
       const whitespace = new Array(difference).join('\u00A0');
       return text + whitespace;

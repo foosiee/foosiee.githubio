@@ -68,16 +68,22 @@ export default function EmailForm() {
   const [details, setDetails] = useState('');
 
   const handleSubmit = (e) => {
-    // fetch("/", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    //   body: new URLSearchParams({
-    //     "form-name": "contact",
-    //   })
-    //   //body: encode({ "form-name": "contact", ...this.state })
-    // });
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        'form-name': 'contact',
+        email: email,
+        name: name,
+        company: company,
+        details: details,
+      }),
+    });
 
-    console.log(email);
+    setName('');
+    setEmail('');
+    setCompany('');
+    setDetails('');
 
     e.preventDefault();
   };
@@ -116,6 +122,8 @@ export default function EmailForm() {
             label="Name"
             type="name"
             name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -124,6 +132,8 @@ export default function EmailForm() {
             id="standard-basic"
             label="Company"
             name="company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -133,6 +143,8 @@ export default function EmailForm() {
             rowsMin={10}
             placeholder="Any further details"
             name="details"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
