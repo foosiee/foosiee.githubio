@@ -19,6 +19,8 @@ export default function Resume() {
   const email = 'colefoos27@hotmail.com';
   const linkedInAddress = 'https://www.linkedin.com/in/colefoos/';
   const githubAddress = 'https://github.com/foosiee';
+  const resumeLink =
+    'https://docs.google.com/document/d/1kZnIdJevnbNIP4PkhYBKB-LquUr3riTyOVnX1I67dMk/edit?usp=sharing';
 
   return (
     <Container maxWidth="lg" className="border">
@@ -195,6 +197,10 @@ export default function Resume() {
         </Grid>
 
         <Grid item xs={12}>
+          <Spacer amount={20} />
+          <StyledLink href={resumeLink}>
+            Link to my downloadable resume
+          </StyledLink>
           <Spacer amount={10} />
         </Grid>
       </Grid>
