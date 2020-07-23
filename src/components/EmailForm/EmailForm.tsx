@@ -58,12 +58,16 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function EmailForm() {
   const classes = useStyles();
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  }
+
   return (
     <div>
         <Grid item xs={12}>
         <h4><ColoredText color="#50fa7b">Contact Me</ColoredText></h4>
       </Grid>
-      <form name="contact" className={classes.root} noValidate autoComplete="off" data-netlify={true} data-netlify-honeypot="bot-field">
+      <form name="contact" className={classes.root} noValidate autoComplete="off" data-netlify={true} data-netlify-honeypot="bot-field" onSubmit={handleSubmit}>
         <Grid item xs={12}>
           <CssTextField fullWidth={true} id="standard-basic" label="Email"  type="email" name="email" />
         </Grid>
@@ -77,7 +81,7 @@ export default function EmailForm() {
           <TextareaAutosize className={classes.wide} aria-label="minimum height" rowsMin={10}  placeholder="Any further details"  name="details" />          
         </Grid>
         <Grid item xs={12}>
-          <StyledButton>Submit</StyledButton>
+          <StyledButton isSubmit={true}>Submit</StyledButton>
         </Grid>
       </form>
     </div>
