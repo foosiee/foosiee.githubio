@@ -112,7 +112,10 @@ export default function Resume() {
             </li>
             <li>Build serverless applications and APIs on AWS</li>
             <li>Refactored IOT applications</li>
-            <li>Worked with AWS, Azure, Python, C#, Javascript, React</li>
+            <li>
+              Worked with AWS, Azure, Google Cloud Platform, Python, C#,
+              Javascript, React
+            </li>
           </ul>
         </Grid>
 
@@ -145,12 +148,14 @@ export default function Resume() {
               <li>React</li>
               <li>Java</li>
               <li>Amazon Web Services</li>
+              <li>Azure</li>
             </ul>
             <ul>
               <li>Typescript</li>
               <li>Angular</li>
               <li>C#</li>
               <li>Google Cloud Platform</li>
+              <li>Salesforce</li>
             </ul>
           </div>
         </Grid>
