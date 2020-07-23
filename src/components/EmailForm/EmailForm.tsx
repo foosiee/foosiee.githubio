@@ -63,18 +63,18 @@ export default function EmailForm() {
         <Grid item xs={12}>
         <h4><ColoredText color="#50fa7b">Contact Me</ColoredText></h4>
       </Grid>
-      <form className={classes.root} noValidate autoComplete="off" data-netlify={true} data-netlify-honeypot="bot-field">
+      <form name="contact" className={classes.root} noValidate autoComplete="off" data-netlify={true} data-netlify-honeypot="bot-field">
         <Grid item xs={12}>
-          <CssTextField fullWidth={true} id="standard-basic" label="Email"  type="email" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Email"  type="email" name="email" />
         </Grid>
         <Grid item xs={12}>
-          <CssTextField fullWidth={true} id="standard-basic" label="Name" type="name" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Name" type="name" name="name" />
         </Grid>
         <Grid item xs={12}>
-          <CssTextField fullWidth={true} id="standard-basic" label="Company" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Company" name="company" />
         </Grid>
         <Grid item xs={12}>
-          <TextareaAutosize className={classes.wide} aria-label="minimum height" rowsMin={10}  placeholder="Any further details" />          
+          <TextareaAutosize className={classes.wide} aria-label="minimum height" rowsMin={10}  placeholder="Any further details"  name="details" />          
         </Grid>
         <Grid item xs={12}>
           <StyledButton>Submit</StyledButton>
