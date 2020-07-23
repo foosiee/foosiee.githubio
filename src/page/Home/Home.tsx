@@ -7,6 +7,7 @@ import EmailForm from '../../components/EmailForm/EmailForm';
 import './Home.css';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
 import Introduction from '../../components/Introduction/Introduction';
+import StyledLink from '../../components/StyledLink/StyledLink';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,6 +41,14 @@ export default function Home() {
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
             <EmailForm />
+          </div>
+        </Grid>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block' }}>
+            <p style={{ color: '#6272a4' }}>
+              Styling based on my favorite text editor theme{' '}
+              <StyledLink href="https://draculatheme.com/">Dracula</StyledLink>
+            </p>
           </div>
         </Grid>
       </Grid>
