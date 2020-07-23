@@ -14,7 +14,7 @@ export default class Introduction extends Component {
           University of Toledo
         </StyledLink>{' '}
         graduating December 2020. Some of my favorite things to work with in
-        tech is AWS Lambda functions, Typescript, React, Angular and Python.
+        tech are AWS Lambda functions, Typescript, React, Angular and Python.
         Outside of tech I love to watch and play sports, listen to music, play
         guitar and play video games.
       </div>
