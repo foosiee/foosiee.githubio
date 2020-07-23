@@ -11,8 +11,12 @@ const ColorButton = withStyles(() => ({
   },
 }))(Button);
 
-export default function StyledButton(props: {children?: any}) {
+export default function StyledButton(props: {isSubmit?: boolean, children?: any}) {
   return (
-    <ColorButton>{props.children}</ColorButton>
+    <div>
+      {props.isSubmit 
+        ? <ColorButton type="submit">{props.children}</ColorButton>
+        : <ColorButton>{props.children}</ColorButton>}
+    </div>
   )
 }

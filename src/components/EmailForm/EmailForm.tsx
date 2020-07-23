@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { TextareaAutosize, Grid } from '@material-ui/core';
+import { TextareaAutosize, Grid, Button } from '@material-ui/core';
 import StyledButton from '../StyledButton/StyledButton';
 import ColoredText from '../ColoredText/ColoredText';
 
@@ -49,6 +49,9 @@ const useStyles = makeStyles((theme: Theme) =>
     text: {
       color: '#f8f8f2',
     },
+    wide: {
+      width: '100%'
+    }
   }),
 );
 
@@ -56,27 +59,28 @@ export default function EmailForm() {
   const classes = useStyles();
 
   return (
-    <Grid container spacing={1}>
-      <Grid item xs={12}>
+    <div>
+        <Grid item xs={12}>
         <h4><ColoredText color="#50fa7b">Contact Me</ColoredText></h4>
       </Grid>
-      <form className={classes.root} noValidate autoComplete="off" data-netlify={true}>
+      <form className={classes.root} noValidate autoComplete="off" data-netlify={true} data-netlify-honeypot="bot-field">
         <Grid item xs={12}>
-          <CssTextField id="standard-basic" label="Email" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Email"  type="email" />
         </Grid>
         <Grid item xs={12}>
-          <CssTextField id="standard-basic" label="Name" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Name" type="name" />
         </Grid>
         <Grid item xs={12}>
-          <CssTextField id="standard-basic" label="Company" />
+          <CssTextField fullWidth={true} id="standard-basic" label="Company" />
         </Grid>
         <Grid item xs={12}>
-          <TextareaAutosize aria-label="minimum height" rowsMin={3} placeholder="Any further details" />          
+          <TextareaAutosize className={classes.wide} aria-label="minimum height" rowsMin={10}  placeholder="Any further details" />          
         </Grid>
         <Grid item xs={12}>
           <StyledButton>Submit</StyledButton>
         </Grid>
       </form>
-    </Grid>
+    </div>
+    
   );
 }

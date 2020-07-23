@@ -103,6 +103,9 @@ export default function Resume() {
             <Grid item xs={6}>
               <Project title={AutomatedDocumentProcessor.title} link={AutomatedDocumentProcessor.link} description={AutomatedDocumentProcessor.description} />
             </Grid>
+            <Grid item xs={6}>
+              <StyledLink href={githubAddress}>See all projects on my GitHub</StyledLink>
+            </Grid>
           </Grid>
         </Grid>
 

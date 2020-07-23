@@ -37,8 +37,10 @@ export default function Home() {
         <Grid item xs={12}>
           <Resume />
         </Grid>
-        <Grid item xs={12}>
-          <EmailForm />
+        <Grid item xs={12} style={{textAlign: 'center'}}>
+          <div style={{display: 'inline-block'}}>
+            <EmailForm/>
+          </div>
         </Grid>
       </Grid>
     </div>
