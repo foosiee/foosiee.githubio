@@ -1,20 +1,23 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { timer, Subject } from 'rxjs';
 import { map, takeWhile, takeUntil } from 'rxjs/operators';
 
-import './Name.css'
+import './Name.css';
 
-export default class Name extends Component<{completeCallback: () => void},{value: string}> {
+export default class Name extends Component<
+  { completeCallback: () => void },
+  { value: string }
+> {
   private name: string;
   private unmount$: Subject<boolean>;
 
   constructor(props) {
     super(props);
     this.state = {
-      value: ''
-    }
+      value: '',
+    };
 
-    this.name = "hey, i'm cole."
+    this.name = "hey, i'm cole.";
     this.unmount$ = new Subject<boolean>();
   }
 
@@ -38,19 +41,24 @@ export default class Name extends Component<{completeCallback: () => void},{valu
           index++;
           return char;
         })
-      ).subscribe(
-        char => this.setState({value: this.state.value + char}), 
+      )
+      .subscribe(
+        (char) => this.setState({ value: this.state.value + char }),
         () => null,
         () => {
-          if(this.state.value === this.name) {
+          if (this.state.value === this.name) {
             this.props.completeCallback();
           }
-        });
+        }
+      );
   }
 
   render() {
     return (
-      <div className="container"><div>$ {this.state.value}</div><div className="cursor"></div></div>
-    )
+      <div className="container">
+        <div>$ {this.state.value}</div>
+        <div className="cursor"></div>
+      </div>
+    );
   }
 }

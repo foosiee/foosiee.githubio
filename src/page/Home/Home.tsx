@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: 'center',
       color: theme.palette.text.secondary,
     },
-  }),
+  })
 );
 
 export default function Home() {
@@ -29,7 +29,7 @@ export default function Home() {
     <div className={classes.root}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Name completeCallback={() => {}}/>
+          <Name completeCallback={() => {}} />
         </Grid>
         <Grid item xs={12}>
           <Introduction />
@@ -37,9 +37,9 @@ export default function Home() {
         <Grid item xs={12}>
           <Resume />
         </Grid>
-        <Grid item xs={12} style={{textAlign: 'center'}}>
-          <div style={{display: 'inline-block'}}>
-            <EmailForm/>
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block' }}>
+            <EmailForm />
           </div>
         </Grid>
       </Grid>

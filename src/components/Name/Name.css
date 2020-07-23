@@ -1,29 +1,41 @@
 /* body and .text are NOT required for the blinking cursor. */
 .container {
-    display: inline-flex;
-    color: #50fa7b;
-    font-size: 24px;
+  display: inline-flex;
+  color: #50fa7b;
+  font-size: 24px;
 }
 
 .cursor {
-    padding: 0;
-    background-color: #50fa7b;
-    vertical-align: top;
-    width: 10px;
-    /* Set height to the line height of .text */
-    height: 30px;
-    -webkit-animation: blink 1s step-end infinite;
-    animation: blink 1s step-end infinite;
+  padding: 0;
+  background-color: #50fa7b;
+  vertical-align: top;
+  width: 10px;
+  /* Set height to the line height of .text */
+  height: 30px;
+  -webkit-animation: blink 1s step-end infinite;
+  animation: blink 1s step-end infinite;
 }
 
 @-webkit-keyframes blink {
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-  0% { opacity: 1.0; }
-  50% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -1,41 +1,42 @@
 .border {
-    border: 2px solid #8be9fd;
-    border-radius: 8px;
+  border: 2px solid #8be9fd;
+  border-radius: 8px;
 }
 
 .regular-text {
-    color: #f8f8f2;
+  color: #f8f8f2;
 }
 
 .pad {
-    margin: 10px;
+  margin: 10px;
 }
 
 .linkedIn {
-    fill: #f8f8f2;
+  fill: #f8f8f2;
 }
 
 .linkedIn:hover {
-    fill: #0073b1;
+  fill: #0073b1;
 }
 
 .github {
-    fill: #f8f8f2;
+  fill: #f8f8f2;
 }
 
 .github:hover {
-    fill: lightgray;
+  fill: lightgray;
 }
 
-p, li {
-    color: #f8f8f2; 
+p,
+li {
+  color: #f8f8f2;
 }
 
 h4 {
-    margin-top: 0;
-    margin-bottom: 5;
+  margin-top: 0;
+  margin-bottom: 5;
 }
 
 .socal-link {
-    text-decoration: none !important;
+  text-decoration: none !important;
 }

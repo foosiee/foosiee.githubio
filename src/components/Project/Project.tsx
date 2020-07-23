@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     backgroundColor: '#282a36',
     border: '2px solid #8be9fd',
     borderRadius: '8px',
-    overflow: 'auto'
+    overflow: 'auto',
   },
   title: {
     fontSize: 14,
@@ -26,15 +26,13 @@ const useStyles = makeStyles({
   text: {
     color: '#f8f8f2',
   },
-  link: {
-
-  }
+  link: {},
 });
 
 export default function Project(props: {
-  title?: string,
-  link?: string,
-  description?: string
+  title?: string;
+  link?: string;
+  description?: string;
 }) {
   const classes = useStyles();
   const maxTextLength = 180;
@@ -44,11 +42,10 @@ export default function Project(props: {
     console.log(difference);
     if (difference > 0) {
       const whitespace = new Array(difference).join('\u00A0');
-      console.log((text + whitespace).length)
       return text + whitespace;
     }
     return text;
-  }
+  };
 
   return (
     <Card className={classes.root} variant="outlined">

@@ -2,9 +2,7 @@ import React from 'react';
 import Home from './page/Home/Home';
 
 function App() {
-  return (
-    <Home />
-  );
+  return <Home />;
 }
 
 export default App;
