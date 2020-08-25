@@ -23,5 +23,5 @@ export const AutomatedDocumentProcessor = {
   title: 'Automated Document Processor',
   link: '',
   description:
-    'Event driven, serverless processor that reads, extracts and bills invoice information using optical character recogition.',
+    'Event driven, serverless processor that reads, extracts and bills invoice information using optical character recogition. Reduces human interaction with the billing process by 15%',
 };

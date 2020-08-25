@@ -79,29 +79,11 @@ export default function Resume() {
             <ColoredText color="#50fa7b">Experience</ColoredText>
           </h4>
           <div className="regular-text">
-            <ColoredText color="#ffb86c">Amazon</ColoredText>,
-            <ColoredText color="#f1fa8c">Remote</ColoredText> -{' '}
-            <i>Software Development Engineer Intern</i>
-          </div>
-          <p>May 2020 - Present</p>
-          <ul>
-            <li>
-              Develop new features on an Angular web application for customers
-              to query data from AWS Athena and view the results in the
-              application
-            </li>
-            <li>
-              Design and implement event driven backend architecture to respond
-              to a user’s query
-            </li>
-            <li>Worked with AWS, Java, Typescript, Angular</li>
-          </ul>
-          <div className="regular-text">
             <ColoredText color="#ffb86c">Onpoint Group</ColoredText>,
             <ColoredText color="#f1fa8c">Perrysburg, Ohio</ColoredText> -{' '}
-            <i>Cloud Applications Developer Intern</i>
+            <i>Software Developer Intern</i>
           </div>
-          <p>Feb 2019 - May 2020</p>
+          <p>Feb 2019 - May 2020; Aug 2020 - Present</p>
           <ul>
             <li>
               Designed and implemented an automated document processing system
@@ -116,6 +98,24 @@ export default function Resume() {
               Worked with AWS, Azure, Google Cloud Platform, Python, C#,
               Javascript, React
             </li>
+          </ul>
+          <div className="regular-text">
+            <ColoredText color="#ffb86c">Amazon</ColoredText>,
+            <ColoredText color="#f1fa8c">Remote</ColoredText> -{' '}
+            <i>Software Development Engineer Intern</i>
+          </div>
+          <p>May 2020 - Aug 2020</p>
+          <ul>
+            <li>
+              Develop new features on an Angular web application for customers
+              to query data from AWS Athena and view the results in the
+              application
+            </li>
+            <li>
+              Design and implement event driven backend architecture to respond
+              to a user’s query
+            </li>
+            <li>Worked with AWS, Java, Typescript, Angular</li>
           </ul>
         </Grid>
 
