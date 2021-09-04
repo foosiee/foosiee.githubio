@@ -4,37 +4,38 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import StyledLink from '../StyledLink/StyledLink';
-import ColoredText from '../ColoredText/ColoredText';
+import StyledLink from '../styledLink/styledLink';
+import ColoredText from '../coloredText/coloredText';
+import { Project as ProjectType } from '../../types';
+import ThemeContext, { Colors } from '../../context/themeContext';
+import { useContext } from 'react';
 
-const useStyles = makeStyles({
-  root: {
-    width: '100%',
-    height: '100%',
-    display: 'inline-block',
-    backgroundColor: '#282a36',
-    border: '2px solid #8be9fd',
-    borderRadius: '8px',
-    overflow: 'auto',
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-  text: {
-    color: '#f8f8f2',
-  },
-  link: {},
-});
+const useStyles = (colors: Colors) =>
+  makeStyles({
+    root: {
+      width: '100%',
+      height: '100%',
+      display: 'inline-block',
+      backgroundColor: colors.black,
+      border: '2px solid ' + colors.blue,
+      borderRadius: '8px',
+      overflow: 'auto',
+    },
+    title: {
+      fontSize: 14,
+    },
+    pos: {
+      marginBottom: 12,
+    },
+    text: {
+      color: colors.white,
+    },
+    link: {},
+  })();
 
-export default function Project(props: {
-  title?: string;
-  link?: string;
-  description?: string;
-}) {
-  const classes = useStyles();
+export default function Project(props: ProjectType) {
+  const context = useContext(ThemeContext);
+  const classes = useStyles(context);
   const maxTextLength = 180;
 
   const addWhiteSpace = (text: string) => {

@@ -7,60 +7,68 @@ import {
 } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { TextareaAutosize, Grid } from '@material-ui/core';
-import StyledButton from '../StyledButton/StyledButton';
-import ColoredText from '../ColoredText/ColoredText';
+import StyledButton from '../styledButton/styledButton';
+import ColoredText from '../coloredText/coloredText';
+import { useContext } from 'react';
+import ThemeContext, { Colors, theme } from '../../context/themeContext';
 
-const CssTextField = withStyles({
-  root: {
-    '& input': {
-      color: '#f8f8f2',
-    },
-    '& label': {
-      color: '#ff79c6',
-    },
-    '& .MuiInput-underline:before': {
-      borderBottomColor: '#ff79c6',
-    },
-    '& label.Mui-focused': {
-      color: '#ff79c6',
-    },
-    '& .MuiInput-underline:after': {
-      borderBottomColor: '#ff79c6',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#ff79c6',
-        color: 'white',
-      },
-      '&:hover fieldset': {
-        borderColor: 'ff79c6',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#bd93f9',
-      },
-    },
-  },
-})(TextField);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
+const makeStyledTextField = (colors: Colors) =>
+  withStyles({
     root: {
-      '& > *': {
-        margin: theme.spacing(1),
-        width: '25ch',
+      '& input': {
+        color: colors.white,
+      },
+      '& label': {
+        color: colors.pink,
+      },
+      '& .MuiInput-underline:before': {
+        borderBottomColor: colors.pink,
+      },
+      '& label.Mui-focused': {
+        color: colors.pink,
+      },
+      '& .MuiInput-underline:after': {
+        borderBottomColor: colors.pink,
+      },
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+          borderColor: colors.pink,
+          color: colors.white,
+        },
+        '&:hover fieldset': {
+          borderColor: colors.pink,
+        },
+        '&.Mui-focused fieldset': {
+          borderColor: colors.purple,
+        },
       },
     },
-    text: {
-      color: '#f8f8f2',
-    },
-    wide: {
-      width: '100%',
-    },
-  })
-);
+  })(TextField);
+
+const useStyles = (colors: Colors) => {
+  return makeStyles((theme: Theme) =>
+    createStyles({
+      root: {
+        '& > *': {
+          margin: theme.spacing(1),
+          width: '25ch',
+        },
+      },
+      text: {
+        color: colors.white,
+      },
+      wide: {
+        width: '100%',
+      },
+    })
+  )();
+};
+
+const CssTextField = makeStyledTextField(theme);
 
 export default function EmailForm() {
-  const classes = useStyles();
+  const context = useContext(ThemeContext);
+  const classes = useStyles(context);
 
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -92,7 +100,7 @@ export default function EmailForm() {
     <div>
       <Grid item xs={12}>
         <h4>
-          <ColoredText color="#50fa7b">Contact Me</ColoredText>
+          <ColoredText color={context.green}>Contact Me</ColoredText>
         </h4>
       </Grid>
       <form

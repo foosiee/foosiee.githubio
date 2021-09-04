@@ -1,13 +1,15 @@
 import React from 'react';
-import Name from '../../components/Name/Name';
+import Name from '../../components/name/name';
 import Grid from '@material-ui/core/Grid';
-import Resume from '../../components/Resume/Resume';
-import EmailForm from '../../components/EmailForm/EmailForm';
+import Resume from '../../components/resume/resume';
+import EmailForm from '../../components/emailForm/emailForm';
 
-import './Home.css';
+import './home.css';
 import { makeStyles, Theme, createStyles } from '@material-ui/core';
-import Introduction from '../../components/Introduction/Introduction';
-import StyledLink from '../../components/StyledLink/StyledLink';
+import Introduction from '../../components/introduction/introduction';
+import StyledLink from '../../components/styledLink/styledLink';
+import { useContext } from 'react';
+import ThemeContext from '../../context/themeContext';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Home() {
   const classes = useStyles();
+  const theme = useContext(ThemeContext);
 
   return (
     <div className={classes.root}>
@@ -45,7 +48,7 @@ export default function Home() {
         </Grid>
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block' }}>
-            <p style={{ color: '#6272a4' }}>
+            <p style={{ color: theme.muted }}>
               Styling based on my favorite text editor theme{' '}
               <StyledLink href="https://draculatheme.com/">Dracula</StyledLink>
             </p>

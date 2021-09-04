@@ -1,7 +1,6 @@
 /* body and .text are NOT required for the blinking cursor. */
 .container {
   display: inline-flex;
-  color: #50fa7b;
   font-size: 24px;
 }
 

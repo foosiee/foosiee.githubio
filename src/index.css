@@ -11,3 +11,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.regular-text {
+  color: #f8f8f2;
+}
+
+p,
+li,
+i,
+div {
+  color: #f8f8f2;
+}
+
+h4 {
+  margin-top: 0;
+  margin-bottom: 5;
+}

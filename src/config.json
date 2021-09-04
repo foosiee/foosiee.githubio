@@ -1,0 +1,95 @@
+{
+  "jobs": [
+    {
+      "company": "Amazon",
+      "location": "Remote",
+      "title": "Software Development Engineer",
+      "date": "May 2021 - Present",
+      "details": [
+        "Working on features for a marketing tool that allows marketers to engage millions of customers."
+      ]
+    },
+    {
+      "company": "Onpoint Group",
+      "location": "Perrysburg, Ohio",
+      "title": "Software Developer Intern",
+      "date": "Feb 2019 - May 2020; Aug 2020 - Feb 2021",
+      "details": [
+        "Designed and implemented an automated document processing system",
+        "Develop and maintain Power BI embedded websites written in React and C#",
+        "Build serverless applications and APIs on AWS",
+        "Refactored IOT applications",
+        "Worked with AWS, Azure, Google Cloud Platform, Python, C#,Javascript, React"
+      ]
+    },
+    {
+      "company": "Amazon",
+      "location": "Remote",
+      "title": "Software Development Engineer Intern",
+      "date": "May 2020 - Aug 2020",
+      "details": [
+        "Develop new features on an Angular web application for customers to query data from AWS Athena and view the results in the application",
+        "Design and implement event driven backend architecture to respond to a user’s query",
+        "Participate in design and code reviews",
+        "Worked with AWS, Java, Typescript, Angular"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "University of Toledo",
+      "location": "Toledo, Ohio",
+      "date": "Aug 2016 - Dec 2020",
+      "awarded": "B.S in Computer Science",
+      "details": [
+        "3.5 GPA",
+        "Dean’s List - 2016, 2017",
+        "Presidents List - 2019",
+        "UT Writing Excellence Award",
+        "Regent Scholarship Award"
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "React",
+    "Java",
+    "Amazon Web Services",
+    "Azure",
+    "Typescript",
+    "Angular",
+    "C#",
+    "Google Cloud Platform",
+    "Salesforce"
+  ],
+  "projects": [
+    {
+      "title": "spotify-lyrics",
+      "description": "A spotify player that gets the lyrics for the song you are currently listening to.",
+      "link": "https://www.spotify-lyrics.com/"
+    },
+    {
+      "title": "Super-Marka-Metrics",
+      "description": "A supermarket budgeting tool that helped users visualize their spending habits and uses machine learning to predict the cost of future trips to the store.",
+      "link": "https://devpost.com/software/healthystudentuc"
+    },
+    {
+      "title": "V-Net Lab",
+      "description": "A network topology tool similar to Microsoft Visio. Allows user to design the layout of their network and configure network devices.",
+      "link": "https://github.com/foosiee/CSET-3600-VNETLAB_PROJ"
+    },
+    {
+      "title": "Automated Document Processor",
+      "description": "Event driven, serverless processor that reads, extracts and bills invoice information using optical character recogition. Reduces human interaction with the billing process by 15%"
+    },
+    {
+      "title": "zero-touch-sani-system",
+      "description": "Senior design project. A handsfree sanitation system to sanitize areas in the office. Uses raspberry pi, various perhipals like monition sensors, google cloud IOT, firebase and a web interface to control the device.",
+      "link": "https://github.com/foosiee/zero-touch-sani-system"
+    }
+  ],
+  "email": "colefoos27@hotmail.com",
+  "linkedin": "https://www.linkedin.com/in/colefoos",
+  "github": "https://github.com/foosiee",
+  "resume": "https://docs.google.com/document/d/1kZnIdJevnbNIP4PkhYBKB-LquUr3riTyOVnX1I67dMk/edit?usp=sharing"
+}

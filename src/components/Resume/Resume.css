@@ -3,10 +3,6 @@
   border-radius: 8px;
 }
 
-.regular-text {
-  color: #f8f8f2;
-}
-
 .pad {
   margin: 10px;
 }
@@ -25,16 +21,6 @@
 
 .github:hover {
   fill: lightgray;
-}
-
-p,
-li {
-  color: #f8f8f2;
-}
-
-h4 {
-  margin-top: 0;
-  margin-bottom: 5;
 }
 
 .socal-link {

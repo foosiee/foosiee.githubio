@@ -1,15 +1,19 @@
 import React from 'react';
 import { withStyles, Button } from '@material-ui/core';
+import { Colors, theme } from '../../context/themeContext';
 
-const ColorButton = withStyles(() => ({
-  root: {
-    color: '#f8f8f2',
-    backgroundColor: '#bd93f9',
-    '&:hover': {
-      backgroundColor: '#bd93f9',
+const makeStyledButton = (colors: Colors) =>
+  withStyles(() => ({
+    root: {
+      color: colors.white,
+      backgroundColor: colors.purple,
+      '&:hover': {
+        backgroundColor: colors.purple,
+      },
     },
-  },
-}))(Button);
+  }))(Button);
+
+const ColorButton = makeStyledButton(theme);
 
 export default function StyledButton(props: {
   isSubmit?: boolean;

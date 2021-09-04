@@ -1,64 +1,54 @@
-import React, { Component } from 'react';
+import React, { useContext } from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import { timer, Subject } from 'rxjs';
 import { map, takeWhile, takeUntil } from 'rxjs/operators';
+import ThemeContext from '../../context/themeContext';
+import ColoredText from '../coloredText/coloredText';
 
-import './Name.css';
+import './name.css';
 
-export default class Name extends Component<
-  { completeCallback: () => void },
-  { value: string }
-> {
-  private name: string;
-  private unmount$: Subject<boolean>;
+export default function Name(props: { completeCallback: () => void }) {
+  const name = 'export name=cole';
+  const [nameValue, setNameValue] = useState('');
+  const unmount$ = new Subject();
+  const context = useContext(ThemeContext);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: '',
-    };
-
-    this.name = "hey, i'm cole.";
-    this.unmount$ = new Subject<boolean>();
-  }
-
-  componentDidMount() {
-    this.subscribeToType();
-  }
-
-  componentWillUnmount() {
-    this.unmount$.next();
-    this.unmount$.unsubscribe();
-  }
-
-  private subscribeToType() {
+  const subscribeToType = () => {
     let index = 0;
+    let currSubString = '';
     timer(0, 200)
       .pipe(
-        takeWhile(() => this.state.value !== this.name),
-        takeUntil(this.unmount$),
+        takeWhile(() => currSubString !== name),
         map(() => {
-          const char = this.name[index];
+          const char = name[index];
           index++;
           return char;
-        })
+        }),
+        takeUntil(unmount$)
       )
       .subscribe(
-        (char) => this.setState({ value: this.state.value + char }),
-        () => null,
-        () => {
-          if (this.state.value === this.name) {
-            this.props.completeCallback();
-          }
-        }
+        (char) => {
+          currSubString = currSubString + char;
+          setNameValue(currSubString);
+        },
+        () => undefined,
+        () => (nameValue === name ? props.completeCallback() : undefined)
       );
-  }
+  };
 
-  render() {
-    return (
-      <div className="container">
-        <div>$ {this.state.value}</div>
-        <div className="cursor"></div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    subscribeToType();
+    return () => {
+      unmount$.next();
+      unmount$.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <div className="container">
+      <ColoredText color={context.green}>$ {nameValue}</ColoredText>
+      <div className="cursor"></div>
+    </div>
+  );
 }
