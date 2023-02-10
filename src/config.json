@@ -2,9 +2,16 @@
   "jobs": [
     {
       "company": "Amazon",
+      "location": "Arlington, Virginia",
+      "title": "Software Development Engineer II",
+      "date": "Oct 2022 - Present",
+      "details": []
+    },
+    {
+      "company": "Amazon",
       "location": "Remote",
       "title": "Software Development Engineer",
-      "date": "May 2021 - Present",
+      "date": "May 2021 - Oct 2022",
       "details": [
         "Working on features for a marketing tool that allows marketers to engage millions of customers."
       ]
