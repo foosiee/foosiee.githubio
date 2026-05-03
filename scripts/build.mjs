@@ -37,7 +37,7 @@ function run(command, args, options = {}) {
 }
 
 function commandExists(command) {
-  const probe = spawnSync(command, ["--version"], {
+  const probe = spawnSync("which", [command], {
     cwd: projectRoot,
     stdio: "ignore",
     shell: false,
@@ -98,24 +98,9 @@ function cedarSourceIsNewerThanGenerated() {
 }
 
 function ensureCedarArtifacts() {
-  if (!existsSync(cedarWasmJs) || !existsSync(cedarWasmFile)) {
-    if (!commandExists("cargo") || !commandExists("wasm-bindgen")) {
-      throw new Error(
-        "Cedar wasm artifacts are missing and the Rust toolchain is not available to rebuild them."
-      );
-    }
-
-    rebuildCedar();
-    return;
-  }
-
-  if (!cedarSourceIsNewerThanGenerated()) {
-    return;
-  }
-
   if (!commandExists("cargo")) {
     throw new Error(
-      "Cedar source changed, but cargo is not available to rebuild the wasm bundle."
+      "Cedar wasm rebuild requires cargo, but it is not available in the build environment."
     );
   }
 
@@ -133,6 +118,14 @@ function ensureCedarArtifacts() {
       cedarWasmVersion,
       "wasm-bindgen-cli",
     ]);
+  }
+
+  if (
+    existsSync(cedarWasmJs) &&
+    existsSync(cedarWasmFile) &&
+    !cedarSourceIsNewerThanGenerated()
+  ) {
+    return;
   }
 
   rebuildCedar();
