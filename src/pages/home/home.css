@@ -4,6 +4,94 @@
   padding: 14px 14px 88px;
 }
 
+.startup-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(
+    circle at top,
+    #123a12 0,
+    #051405 42%,
+    #010401 100%
+  );
+}
+
+.startup-shell {
+  width: min(780px, 100%);
+  padding: 22px;
+  border: 2px solid #6f6f6f;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #000;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55);
+  color: #59ff85;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+.startup-brand,
+.startup-copy,
+.startup-console p {
+  margin: 0;
+}
+
+.startup-brand {
+  margin-bottom: 14px;
+  color: #d8ffd8;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.startup-console {
+  display: grid;
+  gap: 8px;
+  min-height: 180px;
+  padding: 16px;
+  border: 1px solid #2f6b2f;
+  background: rgba(8, 26, 8, 0.92);
+}
+
+.startup-cursor {
+  animation: startup-blink 0.9s steps(1) infinite;
+}
+
+.startup-progress {
+  height: 22px;
+  margin-top: 16px;
+  border: 2px solid #4b4b4b;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #c6c6c6;
+  overflow: hidden;
+}
+
+.startup-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0b2f78, #39a1ff);
+  transition: width 180ms linear;
+}
+
+.startup-copy {
+  margin-top: 12px;
+  color: #9fffb8;
+  font-size: 0.82rem;
+}
+
+@keyframes startup-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .boot-header {
   display: flex;
   align-items: center;

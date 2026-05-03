@@ -20,6 +20,15 @@
 - Improve Cedar completion docs and hover rendering inside Monaco
 - Add debounce and small caching for Cedar language-service diagnostics
 
+## Rust/WASM Shell
+
+- Move the terminal command engine into Rust/WASM first
+- Move the desktop/window manager state machine into Rust/WASM next
+- Keep React as the presentation layer while Rust powers shell behavior
+- Add a shared app manifest layer so desktop apps can be described once and rendered in React or Rust
+- Explore a Tauri/native wrapper once the Rust core is stable
+- Treat native app support as an eventual packaged version of the same shell, not a parallel rewrite
+
 ## Content Ideas
 
 - Turn projects into individual desktop apps/windows
@@ -30,4 +39,3 @@
 - Connect the Cedar case-study window to the live in-site Cedar Lab app
 - Add a richer “about” profile with engineering philosophy and current interests
 - Add a timeline or system-log view for experience
-  /

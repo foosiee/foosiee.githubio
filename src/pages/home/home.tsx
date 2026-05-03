@@ -66,6 +66,11 @@ interface ProjectShowcase {
   launchAppId?: AppId;
 }
 
+interface BootStep {
+  delay: number;
+  line: string;
+}
+
 const APP_DEFINITIONS: AppDefinition[] = [
   {
     id: 'about',
@@ -237,6 +242,15 @@ const PROJECT_SHOWCASES: ProjectShowcase[] = [
   },
 ];
 
+const BOOT_SEQUENCE: BootStep[] = [
+  { delay: 220, line: 'COLE BIOS v9.5' },
+  { delay: 420, line: '640K SYSTEM MEMORY ........ OK' },
+  { delay: 620, line: 'DETECTING AUTHORIZATION MODULES ........ OK' },
+  { delay: 860, line: 'LOADING AWS PROFILE ........ OK' },
+  { delay: 1100, line: 'INITIALIZING CEDAR LAB ........ OK' },
+  { delay: 1380, line: 'STARTING COLEOS 95 SHELL ........ OK' },
+];
+
 function ExternalLink(props: {
   href: string;
   children: React.ReactNode;
@@ -386,10 +400,30 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState(
     PROJECT_SHOWCASES[0].id
   );
+  const [bootLines, setBootLines] = useState<string[]>([]);
+  const [bootComplete, setBootComplete] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
     'COLEOS 95 command shell ready.',
     'Type HELP for commands or OPEN ABOUT to launch a window.',
   ]);
+
+  useEffect(() => {
+    const timeouts = BOOT_SEQUENCE.map((step, index) =>
+      window.setTimeout(() => {
+        setBootLines((current) => [...current, step.line]);
+
+        if (index === BOOT_SEQUENCE.length - 1) {
+          window.setTimeout(() => {
+            setBootComplete(true);
+          }, 380);
+        }
+      }, step.delay)
+    );
+
+    return () => {
+      timeouts.forEach((timeout) => window.clearTimeout(timeout));
+    };
+  }, []);
 
   useEffect(() => {
     if (!dragState) {
@@ -948,6 +982,32 @@ export default function Home() {
 
   return (
     <main className="home-page">
+      {!bootComplete ? (
+        <div className="startup-screen" aria-hidden="true">
+          <div className="startup-shell">
+            <p className="startup-brand">COLEOS 95 STARTUP</p>
+            <div className="startup-console">
+              {bootLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+              <p className="startup-cursor">_</p>
+            </div>
+            <div className="startup-progress">
+              <div
+                className="startup-progress-bar"
+                style={{
+                  width: `${Math.max(
+                    12,
+                    (bootLines.length / BOOT_SEQUENCE.length) * 100
+                  )}%`,
+                }}
+              />
+            </div>
+            <p className="startup-copy">Booting portfolio desktop...</p>
+          </div>
+        </div>
+      ) : null}
+
       <header className="boot-header">
         <div className="boot-status">
           <span className="status-dot" />
