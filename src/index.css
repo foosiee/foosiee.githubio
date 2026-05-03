@@ -1,29 +1,42 @@
+:root {
+  --desktop-teal: #008080;
+  --desktop-teal-dark: #005f5f;
+  --window-gray: #c6c6c6;
+  --text-primary: #111111;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: #282a36;
   margin: 0;
-  overflow: auto;
-  font-family: Monaco, Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  background: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, var(--desktop-teal), var(--desktop-teal-dark));
+  background-size: 18px 18px, 18px 18px, 100% 100%;
+  color: var(--text-primary);
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+a,
+button,
+input,
+textarea {
+  font: inherit;
 }
 
-.regular-text {
-  color: #f8f8f2;
-}
-
+h1,
+h2,
+h3,
 p,
-li,
-i,
-div {
-  color: #f8f8f2;
-}
-
-h4 {
+ul {
   margin-top: 0;
-  margin-bottom: 5;
 }
