@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "rustup target add wasm32-unknown-unknown && npm run build"
   publish = "dist"
 
 [build.environment]
