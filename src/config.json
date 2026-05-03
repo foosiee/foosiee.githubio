@@ -1,32 +1,68 @@
 {
   "jobs": [
     {
+      "company": "Amazon Web Services",
+      "location": "Arlington, Virginia",
+      "title": "Software Development Engineer III",
+      "date": "Apr 2025 - Present",
+      "details": ["Working on new features for Amazon Verified Permissions."]
+    },
+    {
+      "company": "Amazon Web Services",
+      "location": "Arlington, Virginia",
+      "title": "Software Development Engineer II",
+      "date": "Nov 2023 - Apr 2025",
+      "details": [
+        "Designed and developed a Rust-based managed authentication and authorization service for a new zero trust identity system.",
+        "Vendored internal Rust libraries for other AWS service teams integrating with the service.",
+        "Engineered caching solutions that delivered single-digit millisecond response times.",
+        "Created design task breakdowns and collaborated across multiple teams on implementation."
+      ]
+    },
+    {
       "company": "Amazon",
       "location": "Arlington, Virginia",
       "title": "Software Development Engineer II",
-      "date": "Oct 2022 - Present",
-      "details": []
+      "date": "Oct 2022 - Nov 2023",
+      "details": [
+        "Built features for a drag-and-drop lifecycle marketing tool used to create personalized customer experiences for millions of users per day.",
+        "Developed a cross-team ML feature for automatically selecting the best customer experience.",
+        "Reduced S3, Athena, and Glue resource utilization through storage reductions, query optimization, and effective partitioning.",
+        "Created an automated system to halt under-performing or malfunctioning marketing campaigns."
+      ]
     },
     {
       "company": "Amazon",
       "location": "Remote",
-      "title": "Software Development Engineer",
+      "title": "Software Development Engineer I",
       "date": "May 2021 - Oct 2022",
       "details": [
-        "Working on features for a marketing tool that allows marketers to engage millions of customers."
+        "Designed and implemented a notification system that sent hundreds of weekly alerts about campaign progress, engagement, and issues.",
+        "Developed a high-capacity customer event processor that managed millions of events and triggered engagement on key lifecycle milestones."
+      ]
+    },
+    {
+      "company": "Onpoint Group",
+      "location": "Remote",
+      "title": "Software Developer Intern",
+      "date": "Aug 2020 - Feb 2021",
+      "details": [
+        "Collaborated with a third-party mobile app vendor to build backend services for the company's new mobile application.",
+        "Created a CI/CD deployment pipeline with GitHub Actions.",
+        "Integrated with Salesforce and other third-party CRMs."
       ]
     },
     {
       "company": "Onpoint Group",
       "location": "Perrysburg, Ohio",
       "title": "Software Developer Intern",
-      "date": "Feb 2019 - May 2020; Aug 2020 - Feb 2021",
+      "date": "Feb 2019 - May 2020",
       "details": [
-        "Designed and implemented an automated document processing system",
-        "Develop and maintain Power BI embedded websites written in React and C#",
-        "Build serverless applications and APIs on AWS",
-        "Refactored IOT applications",
-        "Worked with AWS, Azure, Google Cloud Platform, Python, C#,Javascript, React"
+        "Streamlined financial operations with an invoice system built on Amazon Textract, Amazon Rekognition, and Salesforce that processed hundreds of invoices per day.",
+        "Developed web-accessible Power BI dashboards for both internal and external use.",
+        "Refactored an Azure IoT application to reduce expenses.",
+        "Enhanced Azure Cosmos DB request efficiency, resulting in a 10x reduction in website load times.",
+        "Migrated projects from Team Foundation Server to GitHub."
       ]
     },
     {
@@ -35,10 +71,9 @@
       "title": "Software Development Engineer Intern",
       "date": "May 2020 - Aug 2020",
       "details": [
-        "Develop new features on an Angular web application for customers to query data from AWS Athena and view the results in the application",
-        "Design and implement event driven backend architecture to respond to a user’s query",
-        "Participate in design and code reviews",
-        "Worked with AWS, Java, Typescript, Angular"
+        "Designed and delivered a debugger tool for marketers to see a customer's position in their marketing campaigns.",
+        "Quickly acclimated to a new role during the three-month internship.",
+        "Participated in the team's software development processes."
       ]
     }
   ],
@@ -47,27 +82,19 @@
       "school": "University of Toledo",
       "location": "Toledo, Ohio",
       "date": "Aug 2016 - Dec 2020",
-      "awarded": "B.S in Computer Science",
-      "details": [
-        "3.5 GPA",
-        "Dean’s List - 2016, 2017",
-        "Presidents List - 2019",
-        "UT Writing Excellence Award",
-        "Regent Scholarship Award"
-      ]
+      "awarded": "Bachelor of Computer Science",
+      "details": ["Cum Laude"]
     }
   ],
   "skills": [
+    "Amazon Web Services",
     "Python",
     "React",
-    "Java",
-    "Amazon Web Services",
-    "Azure",
     "Typescript",
     "Angular",
-    "C#",
-    "Google Cloud Platform",
-    "Salesforce"
+    "Rust",
+    "Java",
+    "Docker"
   ],
   "projects": [
     {
