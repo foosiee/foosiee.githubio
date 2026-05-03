@@ -3,23 +3,28 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const projectRoot = process.cwd();
+
 const cedarRoot = path.join(
   projectRoot,
   "vendor",
   "cedar",
   "cedar-language-server"
 );
+
 const cedarGeneratedDir = path.join(
   projectRoot,
   "src",
   "generated",
   "cedar-language-server"
 );
+
 const cedarWasmJs = path.join(cedarGeneratedDir, "cedar_language_server.js");
+
 const cedarWasmFile = path.join(
   cedarGeneratedDir,
   "cedar_language_server_bg.wasm"
 );
+
 const cedarWasmVersion = "0.2.117";
 
 function run(command, args, options = {}) {
@@ -57,7 +62,25 @@ function commandVersion(command) {
     return null;
   }
 
-  return (probe.stdout ?? probe.stderr ?? "").trim();
+  return (probe.stdout || probe.stderr || "").trim();
+}
+
+function cargoTargetDir() {
+  const result = spawnSync(
+    "cargo",
+    ["metadata", "--format-version", "1", "--no-deps"],
+    {
+      cwd: cedarRoot,
+      encoding: "utf8",
+      shell: false,
+    }
+  );
+
+  if (result.status !== 0) {
+    throw new Error("Could not read Cargo metadata.");
+  }
+
+  return JSON.parse(result.stdout).target_directory;
 }
 
 function walkNewestMtime(targetPath) {
@@ -81,6 +104,7 @@ function walkNewestMtime(targetPath) {
 
       const entryPath = path.join(targetPath, entry.name);
       const entryMtime = walkNewestMtime(entryPath);
+
       return Math.max(newest, entryMtime);
     },
     stats.mtimeMs
@@ -89,6 +113,7 @@ function walkNewestMtime(targetPath) {
 
 function cedarSourceIsNewerThanGenerated() {
   const sourceMtime = walkNewestMtime(cedarRoot);
+
   const generatedMtime = Math.max(
     walkNewestMtime(cedarWasmJs),
     walkNewestMtime(cedarWasmFile)
@@ -102,6 +127,7 @@ function findCedarWasmArtifact(targetDir) {
     "cedar_language_server.wasm",
     "cedar_language_server_bg.wasm",
   ];
+
   const matches = [];
 
   function walk(dirPath) {
@@ -198,14 +224,22 @@ function rebuildCedar() {
   );
 
   const cedarTargetDir = path.join(
-    cedarRoot,
-    "target",
+    cargoTargetDir(),
     "wasm32-unknown-unknown",
     "release"
   );
+
   const cedarWasm = findCedarWasmArtifact(cedarTargetDir);
 
   if (!cedarWasm) {
+    console.error(`Searched for Cedar wasm artifact in: ${cedarTargetDir}`);
+
+    if (existsSync(cedarTargetDir)) {
+      console.error(
+        readdirSync(cedarTargetDir, { recursive: true }).join("\n")
+      );
+    }
+
     throw new Error(
       `Could not locate Cedar wasm artifact in ${cedarTargetDir}.`
     );
@@ -221,8 +255,10 @@ function rebuildCedar() {
 }
 
 ensureCedarArtifacts();
+
 run(path.join(projectRoot, "node_modules", ".bin", "prettier"), [
   "--check",
   ".",
 ]);
+
 run(path.join(projectRoot, "node_modules", ".bin", "vite"), ["build"]);
