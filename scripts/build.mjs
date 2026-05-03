@@ -97,6 +97,55 @@ function cedarSourceIsNewerThanGenerated() {
   return sourceMtime > generatedMtime;
 }
 
+function findCedarWasmArtifact(targetDir) {
+  const preferredNames = [
+    "cedar_language_server.wasm",
+    "cedar_language_server_bg.wasm",
+  ];
+  const matches = [];
+
+  function walk(dirPath) {
+    if (!existsSync(dirPath)) {
+      return;
+    }
+
+    for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+      const entryPath = path.join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(entryPath);
+        continue;
+      }
+
+      if (
+        entry.isFile() &&
+        entry.name.startsWith("cedar_language_server") &&
+        entry.name.endsWith(".wasm")
+      ) {
+        matches.push(entryPath);
+      }
+    }
+  }
+
+  walk(targetDir);
+
+  for (const preferredName of preferredNames) {
+    const preferredMatch = matches.find(
+      (candidate) => path.basename(candidate) === preferredName
+    );
+
+    if (preferredMatch) {
+      return preferredMatch;
+    }
+  }
+
+  if (matches.length > 0) {
+    return matches.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
+  }
+
+  return null;
+}
+
 function ensureCedarArtifacts() {
   if (!commandExists("cargo")) {
     throw new Error(
@@ -148,13 +197,19 @@ function rebuildCedar() {
     }
   );
 
-  const cedarWasm = path.join(
+  const cedarTargetDir = path.join(
     cedarRoot,
     "target",
     "wasm32-unknown-unknown",
-    "release",
-    "cedar_language_server.wasm"
+    "release"
   );
+  const cedarWasm = findCedarWasmArtifact(cedarTargetDir);
+
+  if (!cedarWasm) {
+    throw new Error(
+      `Could not locate Cedar wasm artifact in ${cedarTargetDir}.`
+    );
+  }
 
   run("wasm-bindgen", [
     cedarWasm,
