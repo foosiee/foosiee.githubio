@@ -88,6 +88,83 @@
   min-width: 0;
 }
 
+.cedar-workspace {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cedar-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cedar-editor-stack {
+  min-width: 0;
+}
+
+.cedar-document-panel {
+  display: none;
+}
+
+.cedar-document-panel.active {
+  display: block;
+}
+
+.cedar-editor-column,
+.cedar-lsp-panel {
+  min-width: 0;
+}
+
+.cedar-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 2px solid #7c7c7c;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #dfdfdf;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8a8a;
+}
+
+.cedar-tab {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 2px solid #7c7c7c;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #c6c6c6;
+  color: #111;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.cedar-tab.active {
+  background: #fff3bf;
+}
+
+.cedar-lsp-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid #7c7c7c;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background: #ececec;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8a8a;
+}
+
+.cedar-lsp-feature-grid {
+  display: grid;
+  gap: 10px;
+}
+
 .cedar-results-bottom {
   align-items: start;
 }
@@ -176,7 +253,8 @@
 
 @media (max-width: 960px) {
   .cedar-editors,
-  .cedar-results {
+  .cedar-results,
+  .cedar-workspace-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -185,5 +263,9 @@
   .cedar-toolbar,
   .cedar-result-header {
     flex-direction: column;
+  }
+
+  .cedar-tab-bar {
+    justify-content: flex-start;
   }
 }

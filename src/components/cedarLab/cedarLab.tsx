@@ -17,6 +17,7 @@ import {
 import './cedarLab.css';
 
 type CedarModule = typeof import('@cedar-policy/cedar-wasm');
+type CedarDocumentId = 'schema' | 'policies' | 'entities' | 'request';
 
 const SAMPLE_SCHEMA = `entity User;
 entity Folder;
@@ -124,6 +125,10 @@ function CodeEditor(props: {
     editor: Monaco.editor.IStandaloneCodeEditor,
     monaco: typeof Monaco
   ) => void;
+  onUnmount?: (
+    editor: Monaco.editor.IStandaloneCodeEditor,
+    monaco: typeof Monaco
+  ) => void;
 }) {
   const handleMount: OnMount = (editor, monaco) => {
     configureCedarMonaco(monaco as typeof Monaco);
@@ -148,6 +153,7 @@ function CodeEditor(props: {
           value={props.value}
           onChange={(value) => props.onChange(value ?? '')}
           height={props.height ?? 260}
+          onUnmount={props.onUnmount}
           options={{
             automaticLayout: true,
             minimap: { enabled: false },
@@ -185,6 +191,9 @@ export default function CedarLab() {
   const [policyText, setPolicyText] = useState(SAMPLE_POLICIES);
   const [entitiesText, setEntitiesText] = useState(SAMPLE_ENTITIES);
   const [requestText, setRequestText] = useState(SAMPLE_REQUEST);
+  const [activeDocument, setActiveDocument] = useState<CedarDocumentId>(
+    'policies'
+  );
   const [schemaParse, setSchemaParse] = useState<CheckParseAnswer | null>(null);
   const [policyParse, setPolicyParse] = useState<CheckParseAnswer | null>(null);
   const [validation, setValidation] = useState<ValidationAnswer | null>(null);
@@ -350,6 +359,63 @@ export default function CedarLab() {
       ? validation.validationWarnings
       : [];
 
+  const cedarDocuments: Record<
+    CedarDocumentId,
+    {
+      label: string;
+      language: 'cedar' | 'json';
+      path: string;
+      value: string;
+      onChange: (value: string) => void;
+      help: string;
+      canHover: boolean;
+    }
+  > = {
+    schema: {
+      label: 'Schema.cedar',
+      language: 'cedar' as const,
+      path: 'cedar://workspace/schema.cedar',
+      value: schemaText,
+      onChange: setSchemaText,
+      help: 'Define entity types, actions, and relationships.',
+      canHover: false,
+    },
+    policies: {
+      label: 'Policies.cedar',
+      language: 'cedar' as const,
+      path: 'cedar://workspace/policies.cedar',
+      value: policyText,
+      onChange: setPolicyText,
+      help: 'Hover and autocomplete are wired here through the Cedar LSP.',
+      canHover: true,
+    },
+    entities: {
+      label: 'Entities.json',
+      language: 'json' as const,
+      path: 'cedar://workspace/entities.json',
+      value: entitiesText,
+      onChange: setEntitiesText,
+      help: 'Entity graph used by the authorization runtime.',
+      canHover: false,
+    },
+    request: {
+      label: 'Request.json',
+      language: 'json' as const,
+      path: 'cedar://workspace/request.json',
+      value: requestText,
+      onChange: setRequestText,
+      help: 'Principal, action, resource, and context for evaluation.',
+      canHover: false,
+    },
+  };
+  const cedarDocumentOrder: CedarDocumentId[] = [
+    'schema',
+    'policies',
+    'entities',
+    'request',
+  ];
+  const activeDocumentConfig = cedarDocuments[activeDocument];
+
   return (
     <div className="cedar-lab">
       <div className="cedar-toolbar">
@@ -397,37 +463,100 @@ export default function CedarLab() {
         />
       ) : null}
 
-      <div className="cedar-editors">
-        <CodeEditor
-          label="Schema.cedar"
-          language="cedar"
-          path="cedar://workspace/schema.cedar"
-          value={schemaText}
-          onChange={setSchemaText}
-          height={280}
-          onMount={(editor, monaco) => {
-            schemaEditorRef.current = editor;
-            monacoRef.current = monaco;
-            registerCedarEditorService(monaco, {
-              getSchemaText: () => schemaEditorRef.current?.getValue() ?? '',
-            });
-          }}
-        />
-        <CodeEditor
-          label="Policies.cedar"
-          language="cedar"
-          path="cedar://workspace/policies.cedar"
-          value={policyText}
-          onChange={setPolicyText}
-          height={280}
-          onMount={(editor, monaco) => {
-            policyEditorRef.current = editor;
-            monacoRef.current = monaco;
-            registerCedarEditorService(monaco, {
-              getSchemaText: () => schemaEditorRef.current?.getValue() ?? '',
-            });
-          }}
-        />
+      <div className="cedar-workspace">
+        <div className="cedar-tab-bar" role="tablist" aria-label="Cedar files">
+          {cedarDocumentOrder.map((id) => (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={activeDocument === id}
+              className={`cedar-tab${activeDocument === id ? ' active' : ''}`}
+              onClick={() => setActiveDocument(id)}
+            >
+              {cedarDocuments[id].label}
+            </button>
+          ))}
+        </div>
+
+        <div className="cedar-workspace-grid">
+          <div className="cedar-editor-stack">
+            {cedarDocumentOrder.map((id) => {
+              const document = cedarDocuments[id];
+
+              return (
+                <div
+                  key={id}
+                  className={`cedar-document-panel${
+                    activeDocument === id ? ' active' : ''
+                  }`}
+                >
+                  <CodeEditor
+                    label={document.label}
+                    language={document.language}
+                    path={document.path}
+                    value={document.value}
+                    onChange={document.onChange}
+                    height={360}
+                    onMount={(editor, monaco) => {
+                      monacoRef.current = monaco;
+
+                      if (id === 'schema') {
+                        schemaEditorRef.current = editor;
+                      }
+
+                      if (id === 'policies') {
+                        policyEditorRef.current = editor;
+                      }
+
+                      registerCedarEditorService(monaco, {
+                        getSchemaText: () =>
+                          schemaEditorRef.current?.getValue() ?? '',
+                      });
+                    }}
+                    onUnmount={(editor) => {
+                      if (schemaEditorRef.current === editor) {
+                        schemaEditorRef.current = null;
+                      }
+
+                      if (policyEditorRef.current === editor) {
+                        policyEditorRef.current = null;
+                      }
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <aside className="cedar-lsp-panel">
+            <p className="cedar-section-label">Editor Surface</p>
+            <p className="cedar-runtime-copy">{activeDocumentConfig.help}</p>
+            <div className="cedar-lsp-feature-grid">
+              <div className="mini-panel">
+                <p className="skills-status-label">Hover</p>
+                <strong className="skills-status-value">
+                  {activeDocumentConfig.canHover ? 'Available' : 'Policy-only'}
+                </strong>
+              </div>
+              <div className="mini-panel">
+                <p className="skills-status-label">Autocomplete</p>
+                <strong className="skills-status-value">Live</strong>
+              </div>
+              <div className="mini-panel">
+                <p className="skills-status-label">Diagnostics</p>
+                <strong className="skills-status-value">Live markers</strong>
+              </div>
+            </div>
+            <div className="cedar-notes">
+              <p className="cedar-section-label">What to Try</p>
+              <ul className="detail-list compact">
+                <li>Hover over identifiers in `Policies.cedar`.</li>
+                <li>Trigger autocomplete while editing Cedar files.</li>
+                <li>Switch tabs to see parse and validation state update.</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
       </div>
 
       <div className="cedar-results">
@@ -526,9 +655,9 @@ export default function CedarLab() {
           <p className="cedar-section-label">Why This Matters</p>
           <p>
             This window is already running Cedar directly in the browser through
-            WASM. The next step is swapping the textareas for a richer editor
-            and layering in the language-server-driven completions, hover, and
-            diagnostics you built.
+            WASM. The editor now exposes the Cedar files as tabs and gives the
+            language-server work a proper demo surface instead of hiding it
+            inside a cramped two-column layout.
           </p>
           <ul className="detail-list compact">
             <li>Real Cedar parse checks</li>
@@ -591,25 +720,6 @@ export default function CedarLab() {
             Evaluate
           </button>
         </div>
-      </div>
-
-      <div className="cedar-editors">
-        <CodeEditor
-          label="Entities.json"
-          language="json"
-          path="cedar://workspace/entities.json"
-          value={entitiesText}
-          onChange={setEntitiesText}
-          height={260}
-        />
-        <CodeEditor
-          label="Request.json"
-          language="json"
-          path="cedar://workspace/request.json"
-          value={requestText}
-          onChange={setRequestText}
-          height={260}
-        />
       </div>
 
       <div className="cedar-results">
