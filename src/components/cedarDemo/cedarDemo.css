@@ -8,6 +8,7 @@
   --c-ink: var(--ink);
   --c-soft: var(--soft);
   --c-acc: var(--acc);
+  --c-on-acc: var(--on-acc);
   --c-violet: var(--violet);
   --c-ok: var(--ok);
   --c-no: var(--no);
@@ -95,11 +96,11 @@
 .cedar-btn-primary {
   border-color: var(--c-acc);
   background: var(--c-acc);
-  color: oklch(0.2 0.04 351);
+  color: var(--c-on-acc);
 }
 .cedar-btn-primary:hover {
   border-color: var(--c-acc);
-  box-shadow: 0 8px 24px oklch(0.75 0.17 351 / 0.25);
+  box-shadow: var(--shadow-md);
 }
 
 /* status chips */

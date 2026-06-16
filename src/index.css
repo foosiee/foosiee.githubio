@@ -56,7 +56,7 @@ body::after {
   background-size: 200px 200px;
   opacity: 0.025;
 }
-/* Dark — a faint citron signal-light + steel counter-light, neutral dot-grid
+/* Dark — a faint cobalt signal-light + steel counter-light, neutral dot-grid
    and depth wash. */
 html[data-theme='dark'] body::before {
   background-image: radial-gradient(
