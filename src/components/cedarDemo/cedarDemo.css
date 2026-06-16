@@ -1,0 +1,266 @@
+/* Cedar Language Server demo — Dracula, self-contained. Lives in the drawer. */
+.cedar-demo {
+  --c-bg: oklch(0.27 0.022 280);
+  --c-raise: oklch(0.32 0.025 279);
+  --c-sunken: oklch(0.23 0.02 281);
+  --c-line: oklch(0.4 0.03 278);
+  --c-ink: oklch(0.97 0.005 106);
+  --c-soft: oklch(0.64 0.055 277);
+  --c-acc: oklch(0.75 0.17 351);
+  --c-violet: oklch(0.72 0.16 305);
+  --c-ok: oklch(0.87 0.21 150);
+  --c-no: oklch(0.66 0.22 22);
+
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  font-family: 'Archivo', system-ui, sans-serif;
+  color: var(--c-ink);
+}
+
+.cedar-toolbar,
+.cedar-result-card,
+.cedar-tab-bar {
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: var(--c-raise);
+}
+
+.cedar-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+}
+.cedar-kicker {
+  margin: 0 0 6px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-acc);
+}
+.cedar-runtime-copy,
+.cedar-notes p {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--c-soft);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.cedar-toolbar-actions,
+.cedar-chip-row,
+.cedar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.cedar-meta {
+  gap: 8px;
+}
+.cedar-meta-text {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--c-soft);
+}
+
+/* buttons (replace win-button) */
+.cedar-btn {
+  padding: 9px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--c-ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.cedar-btn:hover {
+  border-color: var(--c-soft);
+  transform: translateY(-1px);
+}
+.cedar-btn:focus-visible {
+  outline: 2px solid var(--c-acc);
+  outline-offset: 2px;
+}
+.cedar-btn-primary {
+  border-color: var(--c-acc);
+  background: var(--c-acc);
+  color: oklch(0.2 0.04 351);
+}
+.cedar-btn-primary:hover {
+  border-color: var(--c-acc);
+  box-shadow: 0 8px 24px oklch(0.75 0.17 351 / 0.25);
+}
+
+/* status chips */
+.cedar-status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--c-sunken);
+  color: var(--c-soft);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.cedar-status-good {
+  color: var(--c-ok);
+  border-color: oklch(0.87 0.21 150 / 0.45);
+}
+.cedar-status-bad {
+  color: var(--c-no);
+  border-color: oklch(0.66 0.22 22 / 0.45);
+}
+.cedar-status-muted {
+  color: var(--c-soft);
+}
+
+.cedar-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+.cedar-workspace {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.cedar-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+}
+.cedar-editor-stack {
+  min-width: 0;
+}
+.cedar-document-panel {
+  display: none;
+}
+.cedar-document-panel.active {
+  display: block;
+}
+
+.cedar-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+}
+.cedar-tab {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--c-soft);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.cedar-tab:hover {
+  color: var(--c-ink);
+  border-color: var(--c-soft);
+}
+.cedar-tab.active {
+  color: var(--c-ink);
+  border-color: var(--c-acc);
+  background: var(--c-sunken);
+}
+
+.cedar-editor-block {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.cedar-monaco-shell {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  background: var(--c-sunken);
+}
+
+.cedar-section-label {
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-violet);
+}
+
+.cedar-result-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+.cedar-result-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.cedar-error-block,
+.cedar-error-list {
+  display: grid;
+  gap: 8px;
+}
+.cedar-error-item {
+  padding: 10px 12px;
+  border: 1px solid oklch(0.66 0.22 22 / 0.45);
+  border-radius: 6px;
+  background: oklch(0.66 0.22 22 / 0.1);
+  color: var(--c-ink);
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+.cedar-error-item p,
+.cedar-error-item small {
+  margin: 0;
+}
+.cedar-error-item small {
+  display: block;
+  margin-top: 6px;
+  color: var(--c-soft);
+  line-height: 1.5;
+}
+.cedar-auth-summary p {
+  margin: 0 0 8px;
+  color: var(--c-ink);
+  line-height: 1.6;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+.cedar-auth-summary strong {
+  color: var(--c-acc);
+}
+
+@media (max-width: 760px) {
+  .cedar-results,
+  .cedar-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+  .cedar-toolbar,
+  .cedar-result-header {
+    flex-direction: column;
+  }
+}

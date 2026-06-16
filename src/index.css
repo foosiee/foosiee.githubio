@@ -1,8 +1,8 @@
 :root {
-  --desktop-teal: #008080;
-  --desktop-teal-dark: #005f5f;
-  --window-gray: #c6c6c6;
-  --text-primary: #111111;
+  /* Dracula base — keeps the page background consistent behind the home and in
+     overscroll areas, and avoids a light flash before fonts/CSS settle. */
+  --base-bg: #282a36;
+  --base-ink: #f8f8f2;
 }
 
 * {
@@ -16,14 +16,57 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  background: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(180deg, var(--desktop-teal), var(--desktop-teal-dark));
-  background-size: 18px 18px, 18px 18px, 100% 100%;
-  color: var(--text-primary);
-  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  background: var(--base-bg);
+  color: var(--base-ink);
+  font-family: 'Archivo', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Lit-instrument backdrop ───────────────────────────────────────────────
+   Two fixed layers behind all content (the page surface `.v-noir` is
+   transparent so this shows through). Kept on `body`, not on `.v-noir`, so it
+   never becomes a containing block for the editor's fixed overflow widgets.
+
+   ::before — Dracula light + engineering dot-grid + vertical depth wash.
+   ::after  — film grain (tactility, and it breaks up banding on the wash).
+   Both are decorative and sit behind text, so they cost no contrast. */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  background-image:
+    /* magenta signal-light entering top-left, behind the masthead name */ radial-gradient(
+      125% 80% at 6% -12%,
+      oklch(0.75 0.17 351 / 0.13),
+      transparent 50%
+    ),
+    /* quieter violet counter-light from the top-right */
+      radial-gradient(
+        120% 85% at 104% -6%,
+        oklch(0.72 0.16 305 / 0.1),
+        transparent 46%
+      ),
+    /* faint graph-paper dots — the "instrument" texture, felt not read */
+      radial-gradient(oklch(0.78 0.06 280 / 0.11) 1px, transparent 1.7px),
+    /* vertical depth: lifted near the light source, sinks into deep space */
+      linear-gradient(
+        180deg,
+        oklch(0.305 0.024 280) 0%,
+        oklch(0.265 0.021 281) 45%,
+        oklch(0.235 0.019 284) 100%
+      );
+  background-size: auto, auto, 38px 38px, auto;
+}
+body::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.05;
 }
 
 a,
@@ -39,4 +82,10 @@ h3,
 p,
 ul {
   margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

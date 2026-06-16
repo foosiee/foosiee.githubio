@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-16",
+  "title": "Design System: Cole Foos — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "signal-magenta": {
+        "role": "primary",
+        "displayName": "Signal Magenta",
+        "canonical": "oklch(0.75 0.17 351)",
+        "hexOrigin": "#ff79c6",
+        "tonalRamp": [
+          "oklch(0.22 0.12 351)",
+          "oklch(0.34 0.15 351)",
+          "oklch(0.46 0.17 351)",
+          "oklch(0.56 0.17 351)",
+          "oklch(0.66 0.17 351)",
+          "oklch(0.75 0.17 351)",
+          "oklch(0.85 0.12 351)",
+          "oklch(0.94 0.05 351)"
+        ]
+      },
+      "dracula-violet": {
+        "role": "secondary",
+        "displayName": "Dracula Violet",
+        "canonical": "oklch(0.72 0.16 305)",
+        "hexOrigin": "#bd93f9",
+        "tonalRamp": [
+          "oklch(0.22 0.1 305)",
+          "oklch(0.33 0.13 305)",
+          "oklch(0.44 0.16 305)",
+          "oklch(0.54 0.16 305)",
+          "oklch(0.63 0.16 305)",
+          "oklch(0.72 0.16 305)",
+          "oklch(0.83 0.11 305)",
+          "oklch(0.93 0.05 305)"
+        ]
+      },
+      "allow-green": {
+        "role": "tertiary",
+        "displayName": "Allow Green",
+        "canonical": "oklch(0.87 0.21 150)",
+        "hexOrigin": "#50fa7b",
+        "tonalRamp": [
+          "oklch(0.3 0.1 150)",
+          "oklch(0.42 0.14 150)",
+          "oklch(0.54 0.18 150)",
+          "oklch(0.64 0.2 150)",
+          "oklch(0.76 0.21 150)",
+          "oklch(0.87 0.21 150)",
+          "oklch(0.92 0.14 150)",
+          "oklch(0.96 0.06 150)"
+        ]
+      },
+      "deny-red": {
+        "role": "tertiary",
+        "displayName": "Deny Red",
+        "canonical": "oklch(0.66 0.22 22)",
+        "hexOrigin": "#ff5555",
+        "tonalRamp": [
+          "oklch(0.24 0.12 22)",
+          "oklch(0.35 0.16 22)",
+          "oklch(0.46 0.2 22)",
+          "oklch(0.56 0.22 22)",
+          "oklch(0.66 0.22 22)",
+          "oklch(0.74 0.19 22)",
+          "oklch(0.84 0.12 22)",
+          "oklch(0.93 0.05 22)"
+        ]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Surface Black",
+        "canonical": "oklch(0.27 0.022 280)",
+        "hexOrigin": "#282a36",
+        "tonalRamp": [
+          "oklch(0.2 0.018 280)",
+          "oklch(0.27 0.022 280)",
+          "oklch(0.32 0.025 279)",
+          "oklch(0.4 0.03 278)",
+          "oklch(0.53 0.08 274)",
+          "oklch(0.64 0.055 277)",
+          "oklch(0.82 0.02 200)",
+          "oklch(0.97 0.005 106)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Bone Ink",
+        "canonical": "oklch(0.97 0.005 106)",
+        "hexOrigin": "#f8f8f2"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Lavender",
+        "canonical": "oklch(0.64 0.055 277)"
+      },
+      "comment": {
+        "role": "neutral",
+        "displayName": "Comment",
+        "canonical": "oklch(0.53 0.08 274)",
+        "hexOrigin": "#6272a4"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Raised Surface",
+        "canonical": "oklch(0.32 0.025 279)",
+        "hexOrigin": "#343746"
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.4 0.03 278)",
+        "hexOrigin": "#44475a"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Masthead name. One per page, Archivo 900."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The live-exhibit lead. Sets the proof moment apart."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Work-index entry titles, Archivo 800."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Taglines, blurbs, prose. Cap measure at 52–66ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrows, LIVE marker, dates, code. JetBrains Mono, uppercase."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 2px rgba(13,14,20,0.5)",
+        "purpose": "Hovered index rows and the decision readout — a slight lift on interaction."
+      },
+      {
+        "name": "shadow-md",
+        "value": "0 10px 30px rgba(13,14,20,0.5)",
+        "purpose": "The elevated specimen card holding the live Cedar exhibit. The page's primary focal lift."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 22px 60px rgba(13,14,20,0.6)",
+        "purpose": "Reserved for future modal/overlay surfaces."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Underline wipes and index-row padding shifts."
+      },
+      {
+        "name": "duration-fast",
+        "value": "0.18s",
+        "purpose": "Color/state transitions on hover."
+      }
+    ],
+    "breakpoints": [{ "name": "md", "value": "860px" }]
+  },
+  "components": [
+    {
+      "name": "Scenario Chip",
+      "kind": "chip",
+      "refersTo": "chip-scenario",
+      "description": "Text-led choice in the live exhibit's scenario picker; active state cues with a magenta border only.",
+      "html": "<div style=\"display:flex;flex-direction:column;gap:8px;max-width:320px\"><button class=\"ds-chip\">Alice views her own doc</button><button class=\"ds-chip ds-chip-active\">Bob views a public doc</button></div>",
+      "css": ".ds-chip{display:block;width:100%;text-align:left;padding:12px 14px;border:1px solid oklch(0.4 0.03 278);border-radius:4px;background:transparent;color:oklch(0.64 0.055 277);font-family:Archivo,system-ui,sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;transition:border-color 0.15s,color 0.15s,background 0.15s}.ds-chip:hover{color:oklch(0.97 0.005 106);border-color:oklch(0.64 0.055 277)}.ds-chip:focus-visible{outline:2px solid oklch(0.75 0.17 351);outline-offset:2px}.ds-chip-active{color:oklch(0.97 0.005 106);border-color:oklch(0.75 0.17 351);background:oklch(0.32 0.025 279)}"
+    },
+    {
+      "name": "Numbered Index Row",
+      "kind": "custom",
+      "refersTo": "card-specimen",
+      "description": "The work-list spine: violet ordinal, Archivo-800 title, muted blurb, mono meta. Hairline-separated; lifts and goes magenta on hover.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-row-num\">02</span><span class=\"ds-row-title\">AVP Access Queries</span><span class=\"ds-row-blurb\">Cedar partial-evaluation residuals turned into indexed lookups.</span><span class=\"ds-row-meta\">2024 · Case study</span></a>",
+      "css": ".ds-row{display:grid;grid-template-columns:48px 1fr 1.5fr auto;gap:24px;align-items:baseline;padding:24px 4px;border-top:1px solid oklch(0.4 0.03 278);text-decoration:none;transition:padding-left 0.25s cubic-bezier(0.22,1,0.36,1),background 0.2s}.ds-row:hover{padding-left:16px;background:oklch(0.32 0.025 279);box-shadow:0 1px 2px rgba(13,14,20,0.5)}.ds-row-num{font-family:'JetBrains Mono',monospace;font-size:0.92rem;color:oklch(0.72 0.16 305)}.ds-row-title{font-family:Archivo,sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.035em;color:oklch(0.97 0.005 106);transition:color 0.18s}.ds-row:hover .ds-row-title{color:oklch(0.75 0.17 351)}.ds-row-blurb{color:oklch(0.64 0.055 277);font-family:Archivo,sans-serif;font-size:0.96rem}.ds-row-meta{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:oklch(0.64 0.055 277);white-space:nowrap}"
+    },
+    {
+      "name": "Live Decision Readout",
+      "kind": "custom",
+      "refersTo": "card-specimen",
+      "description": "The 'show, don't tell' centerpiece: an Archivo-900 Allow/Deny word with a mono reason line, on a sunken panel inside the specimen card.",
+      "html": "<div class=\"ds-decision ds-decision-allow\"><span class=\"ds-decision-word\">Allow</span><span class=\"ds-decision-reason\">policy 0 — resource.owner == principal</span></div>",
+      "css": ".ds-decision{padding:22px;border-radius:6px;border:1px solid oklch(0.4 0.03 278);background:oklch(0.23 0.02 281);box-shadow:0 1px 2px rgba(13,14,20,0.5)}.ds-decision-word{display:block;font-family:Archivo,sans-serif;font-weight:900;font-size:2.6rem;line-height:1;letter-spacing:-0.04em}.ds-decision-allow{border-color:oklch(0.87 0.21 150 / 0.5)}.ds-decision-allow .ds-decision-word{color:oklch(0.87 0.21 150)}.ds-decision-deny{border-color:oklch(0.66 0.22 22 / 0.5)}.ds-decision-deny .ds-decision-word{color:oklch(0.66 0.22 22)}.ds-decision-reason{display:block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:oklch(0.64 0.055 277)}"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "link-nav",
+      "description": "Mono label, muted at rest; goes Signal Magenta with an underline wiping in on hover.",
+      "html": "<nav style=\"display:flex;gap:8px;flex-direction:column;align-items:flex-end\"><a class=\"ds-navlink\" href=\"#\">Résumé</a><a class=\"ds-navlink\" href=\"#\">GitHub</a></nav>",
+      "css": ".ds-navlink{position:relative;display:inline-block;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:oklch(0.64 0.055 277);text-decoration:none;transition:color 0.15s}.ds-navlink::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1.5px;background:oklch(0.75 0.17 351);transition:width 0.22s cubic-bezier(0.22,1,0.36,1)}.ds-navlink:hover{color:oklch(0.75 0.17 351)}.ds-navlink:hover::after{width:100%}.ds-navlink:focus-visible{outline:2px solid oklch(0.75 0.17 351);outline-offset:3px}"
+    },
+    {
+      "name": "Specimen Card",
+      "kind": "card",
+      "refersTo": "card-specimen",
+      "description": "The elevated container for the live Cedar exhibit. The page's one true elevation (shadow-md).",
+      "html": "<div class=\"ds-card\"><p style=\"margin:0;font-family:Archivo,sans-serif;color:oklch(0.97 0.005 106)\">Live Cedar exhibit mounts here.</p></div>",
+      "css": ".ds-card{padding:28px;background:oklch(0.32 0.025 279);border:1px solid oklch(0.4 0.03 278);border-radius:8px;box-shadow:0 10px 30px rgba(13,14,20,0.5)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrument Folio",
+    "overview": "An editorial folio — masthead, about, work, experience, colophon — wired like a lab instrument. The structure is print: oversized Archivo headlines, hairline rules, a confident asymmetric masthead. The skin is an instrument: a near-black Dracula surface, monospace readouts, and a single magenta signal that means live. A recruiter reads the folio in ten seconds; an engineer expands a project and runs its live demo in a drawer. The palette is the Dracula theme, chosen because the audience is developers who recognize it on sight. Work and experience are expandable entries; a live project opens its demo in a slide-in drawer, so a new demo is just a new live project — not a new section. It rejects the generic SaaS/portfolio template, costume retro (the retired Win95 desktop), the LinkedIn resume dump, and overdesign for its own sake.",
+    "keyCharacteristics": [
+      "Editorial structure (masthead → about → work → experience → colophon), not a card grid.",
+      "Dracula-dark surface; bone-white text; one magenta signal for live.",
+      "Archivo display weight 900 paired with JetBrains Mono for every label and number.",
+      "Quiet, text-led controls. The interface recedes so the work and the live proof lead.",
+      "Depth from layered shadows, not borders-as-decoration."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Magenta means exactly one thing: live / interactive. If an element is not live, hoverable, or the thing that just ran, it is not magenta. Ordinals are violet; success is green; failure is red; everything else is bone or muted.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lightened-Comment Rule",
+        "body": "Dracula's comment #6272a4 fails 4.5:1 as body text on the surface black. Body sub-text uses Muted Lavender instead. Comment is reserved for large/bold de-emphasized labels only.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Voice Rule",
+        "body": "Archivo carries meaning and emotion; JetBrains Mono carries data and machine state. Never set a date, count, ID, or decision in Archivo, and never set a headline in mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Heavy-on-Dark Rule",
+        "body": "Display and headline run at Archivo 900, not 700 — dark backgrounds eat perceived weight, so the masthead must over-commit to read as confident rather than thin.",
+        "section": "typography"
+      },
+      {
+        "name": "The Deep-Shadow Rule",
+        "body": "On the Dracula surface, shadows must be near-black and generous (>=10px blur for elevation). A pale, tight shadow reads as a 2014 web app and disappears against the dark.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep Signal Magenta to <=10% of any screen, and only for live / interactive meaning.",
+      "Do set every number, date, and machine readout in JetBrains Mono, and every headline in Archivo.",
+      "Do run display/headline at Archivo 900 on the dark surface.",
+      "Do convey depth with deep, near-black layered shadows (>=10px blur for elevation).",
+      "Do keep controls quiet and text-led; let the work and the live proof carry the page.",
+      "Do prove ability with working artifacts (the live Cedar exhibit), per show-don't-tell."
+    ],
+    "donts": [
+      "Don't build a generic SaaS / portfolio template — no gradient hero, no identical icon-card grid, no Inter-everywhere builder look.",
+      "Don't reintroduce costume retro — no CRT flicker, beeps, or fake OS windows.",
+      "Don't paste a LinkedIn-style resume dump — dense corporate bullet lists with no point of view.",
+      "Don't overdesign — no effect that costs clarity or load speed for its own sake.",
+      "Don't use gradient text or background-clip: text (single solid colors only).",
+      "Don't use a colored border-left/border-right stripe as an accent; borders are hairline and full.",
+      "Don't set body sub-text in Dracula Comment #6272a4 — it fails contrast; use Muted Lavender.",
+      "Don't let magenta become decoration. If it isn't live, it isn't magenta."
+    ]
+  }
+}
