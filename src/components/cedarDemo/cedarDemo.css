@@ -1,15 +1,16 @@
-/* Cedar Language Server demo — Dracula, self-contained. Lives in the drawer. */
+/* Cedar Language Server demo — lives in the drawer. Inherits the page theme by
+   mapping its local tokens onto the .v-noir palette (which flips per theme). */
 .cedar-demo {
-  --c-bg: oklch(0.27 0.022 280);
-  --c-raise: oklch(0.32 0.025 279);
-  --c-sunken: oklch(0.23 0.02 281);
-  --c-line: oklch(0.4 0.03 278);
-  --c-ink: oklch(0.97 0.005 106);
-  --c-soft: oklch(0.64 0.055 277);
-  --c-acc: oklch(0.75 0.17 351);
-  --c-violet: oklch(0.72 0.16 305);
-  --c-ok: oklch(0.87 0.21 150);
-  --c-no: oklch(0.66 0.22 22);
+  --c-bg: var(--bg);
+  --c-raise: var(--raise);
+  --c-sunken: var(--sunken);
+  --c-line: var(--line);
+  --c-ink: var(--ink);
+  --c-soft: var(--soft);
+  --c-acc: var(--acc);
+  --c-violet: var(--violet);
+  --c-ok: var(--ok);
+  --c-no: var(--no);
 
   display: grid;
   gap: 14px;

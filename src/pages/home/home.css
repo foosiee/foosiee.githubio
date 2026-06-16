@@ -2,34 +2,82 @@
 /* Fonts (Archivo + JetBrains Mono) are loaded via <link> in index.html. */
 
 .v-noir {
-  /* Dracula palette, expressed in OKLCH (hex origin noted in DESIGN.md) */
-  --bg: oklch(0.27 0.022 280); /* #282a36 background */
-  --raise: oklch(0.32 0.025 279); /* #343746 raised surface */
-  --line: oklch(0.4 0.03 278); /* #44475a selection / border */
-  --ink: oklch(0.97 0.005 106); /* #f8f8f2 foreground */
-  --soft: oklch(0.64 0.055 277); /* readable muted lavender (body sub-text) */
-  --comment: oklch(
-    0.53 0.08 274
-  ); /* #6272a4 comment — decorative labels only */
-  --acc: oklch(0.75 0.17 351); /* #ff79c6 Dracula pink — Signal Magenta */
-  --acc-dim: oklch(0.75 0.17 351 / 0.14);
-  --violet: oklch(0.72 0.16 305); /* #bd93f9 purple — secondary accent */
-  --ok: oklch(0.87 0.21 150); /* #50fa7b green — allow */
-  --no: oklch(0.66 0.22 22); /* #ff5555 red — deny */
+  /* "Paper & Ink" — the LIGHT default. Cool off-white paper, near-black ink,
+     one cobalt signal. Dark ("Slate & Citron") overrides below. Both are keyed
+     off [data-theme] on <html> (set pre-paint by an inline script in index.html). */
+  --bg: oklch(0.98 0.004 250); /* paper */
+  --raise: oklch(0.995 0.0015 250); /* lightest raised sheet (cell) */
+  --sunken: oklch(0.965 0.005 250); /* faint sunken well */
+  --line: oklch(0.88 0.008 255); /* hairline */
+  --ink: oklch(0.26 0.02 262); /* near-black ink */
+  --soft: oklch(0.5 0.025 262); /* secondary text */
+  --comment: oklch(0.6 0.02 262); /* decorative labels only */
+  --acc: oklch(0.5 0.17 258); /* cobalt — the one signal */
+  --acc-dim: oklch(0.95 0.03 258); /* cobalt wash */
+  --violet: oklch(0.5 0.1 262); /* muted cobalt — numbers + micro-labels */
+  --ok: oklch(0.52 0.15 150); /* allow green */
+  --no: oklch(0.55 0.2 25); /* deny red */
 
-  --shadow-sm: 0 1px 2px rgba(13, 14, 20, 0.5);
-  --shadow-md: 0 10px 30px rgba(13, 14, 20, 0.5);
-  --shadow-lg: 0 22px 60px rgba(13, 14, 20, 0.6);
+  --shadow-sm: 0 1px 2px rgba(42, 52, 82, 0.06);
+  --shadow-md: 0 6px 20px rgba(42, 52, 82, 0.09);
+  --shadow-lg: 0 20px 50px rgba(42, 52, 82, 0.16);
+
+  --page-w: 1140px;
+
+  /* Type scale — a committed ~1.13 ramp, replacing a scatter of ad-hoc sizes.
+     Named by role so the same size always means the same thing. */
+  --t-body: 1.0625rem; /* 17px — body + writeup prose */
+  --t-secondary: 0.9375rem; /* 15px — supporting sans (blurbs, deliverables) */
+  --t-meta: 0.8125rem; /* 13px — mono metadata, small nav, chips */
+  --t-label: 0.72rem; /* ~11.5px — uppercase mono micro-labels */
 
   min-height: 100vh;
-  padding: 0 clamp(20px, 6vw, 96px) 90px;
-  /* transparent so the lit-instrument backdrop on <body> shows through */
+  /* small safety gutter only; the page below owns the real horizontal rhythm */
+  padding: 0 clamp(12px, 2vw, 28px) 90px;
+  /* transparent so the lit-instrument backdrop on <body> shows full-width,
+     including the side margins that frame the page */
   background: transparent;
   color: var(--ink);
   font-family: 'Archivo', system-ui, sans-serif;
-  font-size: 17px;
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+  font-size: var(--t-body);
+  /* light-on-dark: a touch more leading, no tightening (it reads lighter) */
+  line-height: 1.6;
+  letter-spacing: 0;
+  font-kerning: normal;
+  font-optical-sizing: auto;
+}
+
+/* "Slate & Citron" — DARK. Neutral charcoal (zero purple), one acid-citron
+   signal. Only the palette + shadows flip; type, layout, and spacing are shared. */
+[data-theme='dark'] .v-noir {
+  --bg: oklch(0.18 0.012 262); /* deep blue-charcoal */
+  --raise: oklch(0.26 0.016 262); /* raised */
+  --sunken: oklch(0.145 0.012 262); /* sunken well (code-bg) */
+  --line: oklch(0.34 0.016 262); /* hairline */
+  --ink: oklch(0.94 0.008 250); /* cool white */
+  --soft: oklch(0.68 0.022 255); /* secondary text */
+  --comment: oklch(0.55 0.02 258); /* decorative labels only */
+  --acc: oklch(0.74 0.13 262); /* cobalt — the one signal */
+  --acc-dim: oklch(0.3 0.07 262); /* cobalt wash */
+  --violet: oklch(0.7 0.06 262); /* muted cobalt — numbers + micro-labels */
+  --ok: oklch(0.82 0.18 150); /* allow green */
+  --no: oklch(0.72 0.19 25); /* deny red */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* The page: a centered measure with generous side margins. No surface — the
+   lit-instrument backdrop runs full-width and the empty margins frame the
+   content as a page on the bench. The margin space is the whole effect. */
+.nr-page {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: 0 clamp(28px, 5vw, 72px);
+  /* a query container so display type scales with the page measure (cqi),
+     not the raw viewport — it tracks --page-w if that ever changes */
+  container-type: inline-size;
 }
 .v-noir a {
   color: inherit;
@@ -43,9 +91,9 @@
 .nr-eyebrow {
   margin: 0 0 16px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.74rem;
+  font-size: var(--t-label);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--acc);
 }
@@ -106,14 +154,15 @@
 .nr-mast h1 {
   margin: 0;
   font-weight: 900;
-  font-size: clamp(3.4rem, 13vw, 8rem);
+  font-size: clamp(3.4rem, 13cqi, 7rem);
   line-height: 0.9;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 .nr-tagline {
   margin: 28px 0 0;
   max-width: 30ch;
-  font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+  font-size: clamp(1.05rem, 2.8cqi, 1.45rem);
   line-height: 1.35;
   color: var(--ink);
   font-weight: 500;
@@ -123,9 +172,38 @@
   text-align: right;
   padding-bottom: 8px;
 }
+.nr-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.nr-theme-toggle:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+.nr-theme-toggle:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+.nr-theme-toggle-glyph {
+  font-size: 0.95rem;
+  line-height: 1;
+}
 .nr-now {
   margin: 0 0 22px;
-  font-size: 0.92rem;
+  font-size: var(--t-secondary);
   color: var(--soft);
 }
 .nr-now span {
@@ -138,7 +216,7 @@
   display: grid;
   gap: 8px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.86rem;
+  font-size: var(--t-meta);
 }
 .nr-links a {
   position: relative;
@@ -174,7 +252,7 @@
 .nr-about-body p {
   margin: 0 0 18px;
   max-width: 60ch;
-  font-size: clamp(1.05rem, 1.9vw, 1.3rem);
+  font-size: clamp(1.05rem, 2.1cqi, 1.25rem);
   line-height: 1.5;
   color: var(--ink);
   text-wrap: pretty;
@@ -185,7 +263,7 @@
 .nr-focus {
   margin: 0;
   align-self: start;
-  font-size: 0.98rem;
+  font-size: var(--t-secondary);
   line-height: 1.6;
   color: var(--soft);
 }
@@ -193,7 +271,7 @@
   display: block;
   margin-bottom: 8px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
+  font-size: var(--t-label);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--violet);
@@ -208,7 +286,7 @@
 }
 .nr-skills code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
+  font-size: var(--t-meta);
   padding: 7px 12px;
   border: 1px solid var(--line);
   border-radius: 4px;
@@ -227,12 +305,13 @@
 .nr-section-head h2 {
   margin: 0;
   font-weight: 700;
-  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-size: clamp(1.35rem, 3.2cqi, 1.85rem);
   letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 .nr-section-note {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.78rem;
+  font-size: var(--t-meta);
   color: var(--soft);
 }
 
@@ -279,25 +358,25 @@
 }
 .nr-num {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.92rem;
+  font-size: var(--t-secondary);
   font-weight: 500;
   color: var(--violet);
   padding-top: 0.4em;
 }
 .nr-num-mono {
-  font-size: 0.8rem;
+  font-size: var(--t-meta);
   padding-top: 0.55em;
   white-space: nowrap;
 }
 .nr-title {
   font-weight: 800;
-  font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+  font-size: clamp(1.4rem, 3.6cqi, 2.2rem);
   line-height: 1.04;
   letter-spacing: -0.035em;
   transition: color 0.18s;
 }
 .nr-title-sm {
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-size: clamp(1.1rem, 2.5cqi, 1.45rem);
   letter-spacing: -0.02em;
 }
 .nr-role {
@@ -321,8 +400,9 @@
 }
 .nr-blurb {
   color: var(--soft);
-  font-size: 0.96rem;
+  font-size: var(--t-secondary);
   max-width: 52ch;
+  text-wrap: pretty;
 }
 .nr-tail {
   display: flex;
@@ -332,11 +412,11 @@
 }
 .nr-era {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
+  font-size: var(--t-meta);
   color: var(--soft);
 }
 .nr-kind {
-  font-size: 0.82rem;
+  font-size: var(--t-meta);
   font-weight: 600;
 }
 .nr-kind-live {
@@ -368,8 +448,9 @@
   margin: 0 0 14px;
   max-width: 60ch;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: var(--t-body);
   line-height: 1.6;
+  text-wrap: pretty;
 }
 .nr-detail-problem {
   color: var(--soft) !important;
@@ -378,7 +459,7 @@
 .nr-detail-label {
   margin: 0 0 12px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
+  font-size: var(--t-label);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--violet);
@@ -394,8 +475,8 @@
   position: relative;
   padding-left: 20px;
   color: var(--ink);
-  font-size: 0.94rem;
-  line-height: 1.45;
+  font-size: var(--t-secondary);
+  line-height: 1.5;
 }
 .nr-deliverables li::before {
   content: '▸';
@@ -411,7 +492,7 @@
 }
 .nr-detail-stack code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
+  font-size: var(--t-label);
   padding: 4px 9px;
   border: 1px solid var(--line);
   border-radius: 4px;
@@ -433,7 +514,7 @@
   background: var(--acc-dim);
   color: var(--ink);
   font: inherit;
-  font-size: 0.92rem;
+  font-size: var(--t-secondary);
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
@@ -452,7 +533,7 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--ink);
-  font-size: 0.92rem;
+  font-size: var(--t-secondary);
   font-weight: 600;
   transition: border-color 0.15s;
 }
@@ -550,7 +631,7 @@
 .nr-drawer-sub {
   margin: 0;
   color: var(--soft);
-  font-size: 0.96rem;
+  font-size: var(--t-secondary);
   line-height: 1.55;
 }
 
@@ -566,7 +647,7 @@
 .nr-colophon h3 {
   margin: 0 0 18px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
+  font-size: var(--t-label);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -580,7 +661,7 @@
 .nr-colophon-links a {
   width: fit-content;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
+  font-size: var(--t-meta);
   color: var(--soft);
   transition: color 0.15s;
 }
@@ -589,7 +670,7 @@
 }
 .nr-reach a {
   font-weight: 800;
-  font-size: clamp(1.4rem, 3.5vw, 2rem);
+  font-size: clamp(1.35rem, 3.6cqi, 1.85rem);
   letter-spacing: -0.025em;
   color: var(--acc);
 }
@@ -597,7 +678,7 @@
   margin: 12px 0 0;
   max-width: 40ch;
   color: var(--soft);
-  font-size: 0.96rem;
+  font-size: var(--t-secondary);
 }
 
 @media (max-width: 860px) {

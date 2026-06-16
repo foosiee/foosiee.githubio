@@ -4,136 +4,173 @@ import { EXPERIENCE, FEATURED, PROFILE, SKILLS } from './content';
 import type { ExperienceEntry, FeaturedProject } from './content';
 import CedarDemo from '../../components/cedarDemo/cedarDemo';
 
+type Theme = 'light' | 'dark';
+
+/** Initial theme: a stored choice wins, else the OS preference (dark default). */
+function initialTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+  const stored = window.localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') return stored;
+  return window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark';
+}
+
 /**
- * The home page — an editorial folio in a Dracula palette ("The Instrument
- * Folio"). Work and experience are expandable entries; a live project opens its
- * demo in a slide-in drawer. See /DESIGN.md.
+ * The home page — an editorial folio ("The Instrument Folio") with a Paper &
+ * Ink (light) / Slate & Citron (dark) theme. Work and experience are
+ * expandable entries; a live project opens its demo in a slide-in drawer.
+ * See /DESIGN.md.
  */
 export default function Home() {
   // First (live) project open by default, so a skimmer sees something runs.
   const [openId, setOpenId] = useState<string | null>(FEATURED[0].id);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
   const toggle = (id: string) => setOpenId((cur) => (cur === id ? null : id));
+
+  // Reflect the theme on <html> (the inline script in index.html set it
+  // pre-paint; this keeps it in sync on toggle) and remember the choice.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
 
   return (
     <div className="v-noir">
-      <header className="nr-mast">
-        <div className="nr-mast-main nr-rise" style={delay(0)}>
-          <p className="nr-eyebrow">Software engineer · {PROFILE.location}</p>
-          <h1>{PROFILE.name}</h1>
-          <p className="nr-tagline">{PROFILE.tagline}</p>
-        </div>
-        <div className="nr-mast-side nr-rise" style={delay(1)}>
-          <p className="nr-now">
-            <span>Now</span>
-            {PROFILE.company}
+      <div className="nr-page">
+        <header className="nr-mast">
+          <div className="nr-mast-main nr-rise" style={delay(0)}>
+            <p className="nr-eyebrow">Software engineer · {PROFILE.location}</p>
+            <h1>{PROFILE.name}</h1>
+            <p className="nr-tagline">{PROFILE.tagline}</p>
+          </div>
+          <div className="nr-mast-side nr-rise" style={delay(1)}>
+            <button
+              type="button"
+              className="nr-theme-toggle"
+              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              aria-label={`Switch to ${
+                theme === 'dark' ? 'light' : 'dark'
+              } theme`}
+            >
+              <span className="nr-theme-toggle-glyph" aria-hidden>
+                {theme === 'dark' ? '☀' : '☾'}
+              </span>
+              {theme === 'dark' ? 'Light' : 'Dark'}
+            </button>
+            <p className="nr-now">
+              <span>Now</span>
+              {PROFILE.company}
+            </p>
+            <nav className="nr-links">
+              <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+                Résumé
+              </a>
+              <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+              <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+              <a href={`mailto:${PROFILE.links.email}`}>Email</a>
+            </nav>
+          </div>
+        </header>
+
+        <section className="nr-about nr-rise" style={delay(2)}>
+          <div className="nr-about-body">
+            {PROFILE.about.map((p) => (
+              <p key={p.slice(0, 16)}>{p}</p>
+            ))}
+          </div>
+          <p className="nr-focus">
+            <span className="nr-focus-label">Currently</span>
+            {PROFILE.focus}
           </p>
-          <nav className="nr-links">
-            <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
-              Résumé
-            </a>
+        </section>
+
+        <section className="nr-section" aria-labelledby="work-h">
+          <div className="nr-section-head">
+            <h2 id="work-h">Selected work</h2>
+            <span className="nr-section-note">
+              Five of sixteen — expand any entry
+            </span>
+          </div>
+          <ol className="nr-list">
+            {FEATURED.map((p, i) => (
+              <WorkEntry
+                key={p.id}
+                project={p}
+                index={i}
+                open={openId === p.id}
+                onToggle={() => toggle(p.id)}
+                onRunDemo={() => setDemoOpen(true)}
+                style={delay(3 + i)}
+              />
+            ))}
+          </ol>
+        </section>
+
+        <section className="nr-section" aria-labelledby="exp-h">
+          <div className="nr-section-head">
+            <h2 id="exp-h">Experience</h2>
+            <span className="nr-section-note">Full résumé on request</span>
+          </div>
+          <ol className="nr-list">
+            {EXPERIENCE.map((e) => (
+              <ExperienceRow
+                key={e.id}
+                entry={e}
+                open={openId === e.id}
+                onToggle={() => toggle(e.id)}
+              />
+            ))}
+          </ol>
+        </section>
+
+        <section
+          className="nr-section nr-skills-section"
+          aria-labelledby="stack-h"
+        >
+          <div className="nr-section-head">
+            <h2 id="stack-h">Stack</h2>
+            <span className="nr-section-note">Day-to-day tools</span>
+          </div>
+          <div className="nr-skills">
+            {SKILLS.map((s) => (
+              <code key={s}>{s}</code>
+            ))}
+          </div>
+        </section>
+
+        <footer className="nr-colophon">
+          <div>
+            <h3>Reach</h3>
+            <p className="nr-reach">
+              <a href={`mailto:${PROFILE.links.email}`}>
+                {PROFILE.links.email}
+              </a>
+            </p>
+            <p className="nr-reach-sub">
+              Open to conversations about authorization, Rust, and product
+              engineering.
+            </p>
+          </div>
+          <div className="nr-colophon-links">
+            <h3>Elsewhere</h3>
             <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
-              GitHub
+              github.com/foosiee
             </a>
             <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn
+              linkedin.com/in/colefoos
             </a>
-            <a href={`mailto:${PROFILE.links.email}`}>Email</a>
-          </nav>
-        </div>
-      </header>
-
-      <section className="nr-about nr-rise" style={delay(2)}>
-        <div className="nr-about-body">
-          {PROFILE.about.map((p) => (
-            <p key={p.slice(0, 16)}>{p}</p>
-          ))}
-        </div>
-        <p className="nr-focus">
-          <span className="nr-focus-label">Currently</span>
-          {PROFILE.focus}
-        </p>
-      </section>
-
-      <section className="nr-section" aria-labelledby="work-h">
-        <div className="nr-section-head">
-          <h2 id="work-h">Selected work</h2>
-          <span className="nr-section-note">
-            Five of sixteen — expand any entry
-          </span>
-        </div>
-        <ol className="nr-list">
-          {FEATURED.map((p, i) => (
-            <WorkEntry
-              key={p.id}
-              project={p}
-              index={i}
-              open={openId === p.id}
-              onToggle={() => toggle(p.id)}
-              onRunDemo={() => setDemoOpen(true)}
-              style={delay(3 + i)}
-            />
-          ))}
-        </ol>
-      </section>
-
-      <section className="nr-section" aria-labelledby="exp-h">
-        <div className="nr-section-head">
-          <h2 id="exp-h">Experience</h2>
-          <span className="nr-section-note">Full résumé on request</span>
-        </div>
-        <ol className="nr-list">
-          {EXPERIENCE.map((e) => (
-            <ExperienceRow
-              key={e.id}
-              entry={e}
-              open={openId === e.id}
-              onToggle={() => toggle(e.id)}
-            />
-          ))}
-        </ol>
-      </section>
-
-      <section
-        className="nr-section nr-skills-section"
-        aria-labelledby="stack-h"
-      >
-        <div className="nr-section-head">
-          <h2 id="stack-h">Stack</h2>
-          <span className="nr-section-note">Day-to-day tools</span>
-        </div>
-        <div className="nr-skills">
-          {SKILLS.map((s) => (
-            <code key={s}>{s}</code>
-          ))}
-        </div>
-      </section>
-
-      <footer className="nr-colophon">
-        <div>
-          <h3>Reach</h3>
-          <p className="nr-reach">
-            <a href={`mailto:${PROFILE.links.email}`}>{PROFILE.links.email}</a>
-          </p>
-          <p className="nr-reach-sub">
-            Open to conversations about authorization, Rust, and product
-            engineering.
-          </p>
-        </div>
-        <div className="nr-colophon-links">
-          <h3>Elsewhere</h3>
-          <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
-            github.com/foosiee
-          </a>
-          <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
-            linkedin.com/in/colefoos
-          </a>
-          <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
-            résumé (PDF)
-          </a>
-        </div>
-      </footer>
-
+            <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+              résumé (PDF)
+            </a>
+          </div>
+        </footer>
+      </div>
       <DemoDrawer open={demoOpen} onClose={() => setDemoOpen(false)} />
     </div>
   );
