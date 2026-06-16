@@ -129,14 +129,23 @@ function CodeEditor(props: {
     editor: Monaco.editor.IStandaloneCodeEditor,
     monaco: typeof Monaco
   ) => void;
+  onMountError?: (message: string) => void;
 }) {
   const handleMount: OnMount = (editor, monaco) => {
-    configureCedarMonaco(monaco as typeof Monaco);
-    monaco.editor.setTheme('cedar-os');
-    props.onMount?.(
-      editor as Monaco.editor.IStandaloneCodeEditor,
-      monaco as typeof Monaco
-    );
+    try {
+      configureCedarMonaco(monaco as typeof Monaco);
+      monaco.editor.setTheme('cedar-os');
+      props.onMount?.(
+        editor as Monaco.editor.IStandaloneCodeEditor,
+        monaco as typeof Monaco
+      );
+    } catch (error) {
+      props.onMountError?.(
+        error instanceof Error
+          ? error.message
+          : 'Failed to initialize Cedar editor.'
+      );
+    }
   };
 
   return (
@@ -145,7 +154,15 @@ function CodeEditor(props: {
       <div className="cedar-monaco-shell">
         <Editor
           beforeMount={(monaco) => {
-            configureCedarMonaco(monaco as typeof Monaco);
+            try {
+              configureCedarMonaco(monaco as typeof Monaco);
+            } catch (error) {
+              props.onMountError?.(
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to initialize Cedar editor.'
+              );
+            }
           }}
           onMount={handleMount}
           language={props.language}
@@ -268,6 +285,20 @@ export default function CedarLab() {
   }, []);
 
   useEffect(() => {
+    if (!cedar) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      analyzeInputs(cedar, schemaText, policyText);
+    }, 180);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [cedar, policyText, schemaText]);
+
+  useEffect(() => {
     const monaco = monacoRef.current;
     const schemaModel = schemaEditorRef.current?.getModel();
     const policyModel = policyEditorRef.current?.getModel();
@@ -307,14 +338,6 @@ export default function CedarLab() {
       window.clearTimeout(timer);
     };
   }, [policyText, schemaText]);
-
-  const runAnalysis = () => {
-    if (!cedar) {
-      return;
-    }
-
-    analyzeInputs(cedar, schemaText, policyText);
-  };
 
   const formatPolicies = () => {
     if (!cedar) {
@@ -414,20 +437,58 @@ export default function CedarLab() {
     'entities',
     'request',
   ];
-  const activeDocumentConfig = cedarDocuments[activeDocument];
 
   return (
     <div className="cedar-lab">
       <div className="cedar-toolbar">
         <div>
-          <p className="prompt-line">C:\&gt; launch cedar-lab.exe</p>
+          <p className="prompt-line">C:\&gt; launch cedar.exe</p>
           <p className="cedar-runtime-copy">
-            In-browser Cedar playground running through WASM.
+            In-browser Cedar editor running through WASM.
           </p>
         </div>
         <div className="cedar-toolbar-actions">
-          <button className="win-button primary" onClick={runAnalysis}>
-            Analyze
+          <button
+            className="win-button primary"
+            onClick={() => {
+              if (!cedar) {
+                return;
+              }
+
+              try {
+                const parsedEntities = JSON.parse(entitiesText);
+                const parsedRequest = JSON.parse(requestText) as {
+                  principal: { type: string; id: string };
+                  action: { type: string; id: string };
+                  resource: { type: string; id: string };
+                  context?: Record<string, unknown>;
+                };
+
+                setAuthorizationErrors([]);
+                setAuthorization(
+                  cedar.isAuthorized({
+                    schema: schemaText,
+                    policies: { staticPolicies: policyText },
+                    entities: parsedEntities,
+                    principal: parsedRequest.principal,
+                    action: parsedRequest.action,
+                    resource: parsedRequest.resource,
+                    context: parsedRequest.context ?? {},
+                    validateRequest: true,
+                  })
+                );
+              } catch (error) {
+                setAuthorization(null);
+                setAuthorizationErrors(
+                  singleError(
+                    'Failed to parse entities.json or request.json.',
+                    error instanceof Error ? error.message : null
+                  )
+                );
+              }
+            }}
+          >
+            Evaluate
           </button>
           <button className="win-button" onClick={formatPolicies}>
             Format
@@ -508,11 +569,21 @@ export default function CedarLab() {
                         policyEditorRef.current = editor;
                       }
 
-                      registerCedarEditorService(monaco, {
-                        getSchemaText: () =>
-                          schemaEditorRef.current?.getValue() ?? '',
-                      });
+                      try {
+                        registerCedarEditorService(monaco, {
+                          getSchemaText: () =>
+                            schemaEditorRef.current?.getValue() ?? '',
+                        });
+                        setLanguageServiceError(null);
+                      } catch (error) {
+                        setLanguageServiceError(
+                          error instanceof Error
+                            ? error.message
+                            : 'Failed to load Cedar language service.'
+                        );
+                      }
                     }}
+                    onMountError={setLanguageServiceError}
                     onUnmount={(editor) => {
                       if (schemaEditorRef.current === editor) {
                         schemaEditorRef.current = null;
@@ -527,198 +598,6 @@ export default function CedarLab() {
               );
             })}
           </div>
-
-          <aside className="cedar-lsp-panel">
-            <p className="cedar-section-label">Editor Surface</p>
-            <p className="cedar-runtime-copy">{activeDocumentConfig.help}</p>
-            <div className="cedar-lsp-feature-grid">
-              <div className="mini-panel">
-                <p className="skills-status-label">Hover</p>
-                <strong className="skills-status-value">
-                  {activeDocumentConfig.canHover ? 'Available' : 'Policy-only'}
-                </strong>
-              </div>
-              <div className="mini-panel">
-                <p className="skills-status-label">Autocomplete</p>
-                <strong className="skills-status-value">Live</strong>
-              </div>
-              <div className="mini-panel">
-                <p className="skills-status-label">Diagnostics</p>
-                <strong className="skills-status-value">Live markers</strong>
-              </div>
-            </div>
-            <div className="cedar-notes">
-              <p className="cedar-section-label">What to Try</p>
-              <ul className="detail-list compact">
-                <li>Hover over identifiers in `Policies.cedar`.</li>
-                <li>Trigger autocomplete while editing Cedar files.</li>
-                <li>Switch tabs to see parse and validation state update.</li>
-              </ul>
-            </div>
-          </aside>
-        </div>
-      </div>
-
-      <div className="cedar-results">
-        <div className="cedar-result-card">
-          <div className="cedar-result-header">
-            <p className="cedar-section-label">Parse Status</p>
-            <div className="cedar-chip-row">
-              <StatusChip
-                label={
-                  schemaParse
-                    ? schemaParse.type === 'success'
-                      ? 'Schema OK'
-                      : 'Schema Error'
-                    : 'Schema idle'
-                }
-                tone={
-                  !schemaParse
-                    ? 'muted'
-                    : schemaParse.type === 'success'
-                    ? 'good'
-                    : 'bad'
-                }
-              />
-              <StatusChip
-                label={
-                  policyParse
-                    ? policyParse.type === 'success'
-                      ? 'Policies OK'
-                      : 'Policies Error'
-                    : 'Policies idle'
-                }
-                tone={
-                  !policyParse
-                    ? 'muted'
-                    : policyParse.type === 'success'
-                    ? 'good'
-                    : 'bad'
-                }
-              />
-            </div>
-          </div>
-          {schemaParse && schemaParse.type === 'failure' ? (
-            <ErrorList title="Schema Errors" errors={schemaParse.errors} />
-          ) : null}
-          {policyParse && policyParse.type === 'failure' ? (
-            <ErrorList title="Policy Errors" errors={policyParse.errors} />
-          ) : null}
-        </div>
-
-        <div className="cedar-result-card">
-          <div className="cedar-result-header">
-            <p className="cedar-section-label">Validation</p>
-            <StatusChip
-              label={
-                validation
-                  ? validation.type === 'success' &&
-                    validationErrors.length === 0 &&
-                    validationWarnings.length === 0
-                    ? 'Strict validation clean'
-                    : validation.type === 'success'
-                    ? 'Validation findings'
-                    : 'Validation failed'
-                  : 'Validation idle'
-              }
-              tone={
-                !validation
-                  ? 'muted'
-                  : validation.type === 'success' &&
-                    validationErrors.length === 0 &&
-                    validationWarnings.length === 0
-                  ? 'good'
-                  : 'bad'
-              }
-            />
-          </div>
-          {validation && validation.type === 'failure' ? (
-            <ErrorList title="Validation Failures" errors={validation.errors} />
-          ) : null}
-          {validationErrors.length > 0 ? (
-            <ErrorList
-              title="Validation Errors"
-              errors={validationErrors.map((item) => item.error)}
-            />
-          ) : null}
-          {validationWarnings.length > 0 ? (
-            <ErrorList
-              title="Validation Warnings"
-              errors={validationWarnings.map((item) => item.error)}
-            />
-          ) : null}
-        </div>
-      </div>
-
-      <div className="cedar-results cedar-results-bottom cedar-results-single">
-        <div className="cedar-result-card cedar-notes">
-          <p className="cedar-section-label">Why This Matters</p>
-          <p>
-            This window is already running Cedar directly in the browser through
-            WASM. The editor now exposes the Cedar files as tabs and gives the
-            language-server work a proper demo surface instead of hiding it
-            inside a cramped two-column layout.
-          </p>
-          <ul className="detail-list compact">
-            <li>Real Cedar parse checks</li>
-            <li>Real Cedar formatting</li>
-            <li>Strict schema validation</li>
-            <li>Live authorization evaluation</li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="cedar-toolbar cedar-auth-toolbar">
-        <div>
-          <p className="prompt-line">C:\&gt; run authorize</p>
-          <p className="cedar-runtime-copy">
-            Evaluate a concrete Cedar request against the current schema,
-            policies, entities, and request context.
-          </p>
-        </div>
-        <div className="cedar-toolbar-actions">
-          <button
-            className="win-button primary"
-            onClick={() => {
-              if (!cedar) {
-                return;
-              }
-
-              try {
-                const parsedEntities = JSON.parse(entitiesText);
-                const parsedRequest = JSON.parse(requestText) as {
-                  principal: { type: string; id: string };
-                  action: { type: string; id: string };
-                  resource: { type: string; id: string };
-                  context?: Record<string, unknown>;
-                };
-
-                setAuthorizationErrors([]);
-                setAuthorization(
-                  cedar.isAuthorized({
-                    schema: schemaText,
-                    policies: { staticPolicies: policyText },
-                    entities: parsedEntities,
-                    principal: parsedRequest.principal,
-                    action: parsedRequest.action,
-                    resource: parsedRequest.resource,
-                    context: parsedRequest.context ?? {},
-                    validateRequest: true,
-                  })
-                );
-              } catch (error) {
-                setAuthorization(null);
-                setAuthorizationErrors(
-                  singleError(
-                    'Failed to parse entities.json or request.json.',
-                    error instanceof Error ? error.message : null
-                  )
-                );
-              }
-            }}
-          >
-            Evaluate
-          </button>
         </div>
       </div>
 
@@ -771,6 +650,97 @@ export default function CedarLab() {
                 </strong>
               </p>
             </div>
+          ) : null}
+        </div>
+
+        <div className="cedar-result-card">
+          <div className="cedar-result-header">
+            <p className="cedar-section-label">Parse Status</p>
+            <div className="cedar-chip-row">
+              <StatusChip
+                label={
+                  schemaParse
+                    ? schemaParse.type === 'success'
+                      ? 'Schema OK'
+                      : 'Schema Error'
+                    : 'Schema idle'
+                }
+                tone={
+                  !schemaParse
+                    ? 'muted'
+                    : schemaParse.type === 'success'
+                    ? 'good'
+                    : 'bad'
+                }
+              />
+              <StatusChip
+                label={
+                  policyParse
+                    ? policyParse.type === 'success'
+                      ? 'Policies OK'
+                      : 'Policies Error'
+                    : 'Policies idle'
+                }
+                tone={
+                  !policyParse
+                    ? 'muted'
+                    : policyParse.type === 'success'
+                    ? 'good'
+                    : 'bad'
+                }
+              />
+            </div>
+          </div>
+          {schemaParse && schemaParse.type === 'failure' ? (
+            <ErrorList title="Schema Errors" errors={schemaParse.errors} />
+          ) : null}
+          {policyParse && policyParse.type === 'failure' ? (
+            <ErrorList title="Policy Errors" errors={policyParse.errors} />
+          ) : null}
+        </div>
+      </div>
+
+      <div className="cedar-results">
+        <div className="cedar-result-card">
+          <div className="cedar-result-header">
+            <p className="cedar-section-label">Validation</p>
+            <StatusChip
+              label={
+                validation
+                  ? validation.type === 'success' &&
+                    validationErrors.length === 0 &&
+                    validationWarnings.length === 0
+                    ? 'Strict validation clean'
+                    : validation.type === 'success'
+                    ? 'Validation findings'
+                    : 'Validation failed'
+                  : 'Validation idle'
+              }
+              tone={
+                !validation
+                  ? 'muted'
+                  : validation.type === 'success' &&
+                    validationErrors.length === 0 &&
+                    validationWarnings.length === 0
+                  ? 'good'
+                  : 'bad'
+              }
+            />
+          </div>
+          {validation && validation.type === 'failure' ? (
+            <ErrorList title="Validation Failures" errors={validation.errors} />
+          ) : null}
+          {validationErrors.length > 0 ? (
+            <ErrorList
+              title="Validation Errors"
+              errors={validationErrors.map((item) => item.error)}
+            />
+          ) : null}
+          {validationWarnings.length > 0 ? (
+            <ErrorList
+              title="Validation Warnings"
+              errors={validationWarnings.map((item) => item.error)}
+            />
           ) : null}
         </div>
 

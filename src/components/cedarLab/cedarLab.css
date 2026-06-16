@@ -22,10 +22,6 @@
   padding: 14px;
 }
 
-.cedar-auth-toolbar {
-  margin-top: 4px;
-}
-
 .cedar-runtime-copy,
 .cedar-notes p {
   margin: 6px 0 0;
@@ -96,7 +92,7 @@
 
 .cedar-workspace-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   min-width: 0;
 }
@@ -111,11 +107,6 @@
 
 .cedar-document-panel.active {
   display: block;
-}
-
-.cedar-editor-column,
-.cedar-lsp-panel {
-  min-width: 0;
 }
 
 .cedar-tab-bar {
@@ -147,22 +138,6 @@
 
 .cedar-tab.active {
   background: #fff3bf;
-}
-
-.cedar-lsp-panel {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-  border: 2px solid #7c7c7c;
-  border-right-color: #fff;
-  border-bottom-color: #fff;
-  background: #ececec;
-  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8a8a8a;
-}
-
-.cedar-lsp-feature-grid {
-  display: grid;
-  gap: 10px;
 }
 
 .cedar-results-bottom {

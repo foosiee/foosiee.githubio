@@ -177,6 +177,12 @@ export function ProjectTabs(props: {
   selected: ProjectPanelTab;
   onSelect: (tab: ProjectPanelTab) => void;
 }) {
+  const labels: Record<ProjectPanelTab, string> = {
+    overview: 'Landing',
+    files: 'Archive',
+    notes: 'Case File',
+  };
+
   return (
     <div className="project-tabs" role="tablist" aria-label="Project details">
       {(['overview', 'files', 'notes'] as ProjectPanelTab[]).map((tab) => (
@@ -187,7 +193,7 @@ export function ProjectTabs(props: {
           className={`project-tab${props.selected === tab ? ' active' : ''}`}
           onClick={() => props.onSelect(tab)}
         >
-          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          {labels[tab]}
         </button>
       ))}
     </div>

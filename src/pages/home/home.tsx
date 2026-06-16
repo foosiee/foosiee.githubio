@@ -13,6 +13,7 @@ import {
   INITIAL_WINDOWS,
   WINDOW_LAYOUTS,
   WindowPosition,
+  WindowSize,
   WindowState,
   AppId,
 } from './home-data';
@@ -27,6 +28,7 @@ import { ProjectsApp } from './apps/projects-app';
 import { ResumeApp } from './apps/resume-app';
 import { SkillsApp } from './apps/skills-app';
 import { TerminalApp } from './apps/terminal-app';
+import CedarLab from '../../components/cedarLab/cedarLab';
 import type { ProjectPanelTab } from './project-data';
 
 import './home.css';
@@ -35,6 +37,14 @@ interface DragState {
   appId: AppId;
   offsetX: number;
   offsetY: number;
+}
+
+interface ResizeState {
+  appId: AppId;
+  startX: number;
+  startY: number;
+  startWidth: number;
+  startHeight: number;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -55,6 +65,20 @@ function buildInitialPositions(): Record<AppId, WindowPosition> {
   }, {} as Record<AppId, WindowPosition>);
 }
 
+function buildInitialSizes(): Record<AppId, WindowSize> {
+  return Object.keys(WINDOW_LAYOUTS).reduce((sizes, appId) => {
+    const typedAppId = appId as AppId;
+
+    return {
+      ...sizes,
+      [typedAppId]: {
+        width: WINDOW_LAYOUTS[typedAppId].width,
+        height: WINDOW_LAYOUTS[typedAppId].height,
+      },
+    };
+  }, {} as Record<AppId, WindowSize>);
+}
+
 function WindowFrame(props: {
   appId: AppId;
   title: string;
@@ -65,6 +89,7 @@ function WindowFrame(props: {
   style?: React.CSSProperties;
   onFocus?: () => void;
   onDragStart?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onResizeStart?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onMinimize?: () => void;
   onClose?: () => void;
 }) {
@@ -97,8 +122,41 @@ function WindowFrame(props: {
         </div>
       </div>
       <div className="window-body">{props.children}</div>
+      <div
+        className="window-resize-handle"
+        onMouseDown={props.onResizeStart}
+        aria-hidden="true"
+      />
     </section>
   );
+}
+
+class WindowErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; message: string | null }
+> {
+  state = { hasError: false, message: null };
+
+  static getDerivedStateFromError(error: unknown) {
+    return {
+      hasError: true,
+      message:
+        error instanceof Error ? error.message : 'Window failed to render.',
+    };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="explorer-empty">
+          <p className="prompt-line">C:\&gt; app /crash</p>
+          <p className="supporting-text">{this.state.message}</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 export default function Home() {
@@ -114,7 +172,11 @@ export default function Home() {
   const [positions, setPositions] = useState<Record<AppId, WindowPosition>>(
     buildInitialPositions
   );
+  const [sizes, setSizes] = useState<Record<AppId, WindowSize>>(
+    buildInitialSizes
+  );
   const [dragState, setDragState] = useState<DragState | null>(null);
+  const [resizeState, setResizeState] = useState<ResizeState | null>(null);
   const [, setNextZIndex] = useState(5);
   const [terminalInput, setTerminalInput] = useState('');
   const [startOpen, setStartOpen] = useState(false);
@@ -153,7 +215,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!dragState) {
+    if (!dragState && !resizeState) {
       return undefined;
     }
 
@@ -171,43 +233,69 @@ export default function Home() {
       }
 
       const canvasRect = canvas.getBoundingClientRect();
-      const windowElement = canvas.querySelector(
-        `[data-window-id="${dragState.appId}"]`
-      ) as HTMLElement | null;
-      const windowRect = windowElement
-        ? windowElement.getBoundingClientRect()
-        : null;
-      const maxLeft = Math.max(
-        0,
-        canvasRect.width -
-          (windowRect
-            ? windowRect.width
-            : WINDOW_LAYOUTS[dragState.appId].width)
-      );
-      const maxTop = Math.max(
-        0,
-        canvasRect.height - (windowRect ? windowRect.height : 180)
-      );
 
-      setPositions((current) => ({
-        ...current,
-        [dragState.appId]: {
-          left: clamp(
-            event.clientX - canvasRect.left - dragState.offsetX,
-            0,
-            maxLeft
-          ),
-          top: clamp(
-            event.clientY - canvasRect.top - dragState.offsetY,
-            0,
-            maxTop
-          ),
-        },
-      }));
+      if (dragState) {
+        const windowElement = canvas.querySelector(
+          `[data-window-id="${dragState.appId}"]`
+        ) as HTMLElement | null;
+        const windowRect = windowElement
+          ? windowElement.getBoundingClientRect()
+          : null;
+        const maxLeft = Math.max(
+          0,
+          canvasRect.width -
+            (windowRect ? windowRect.width : sizes[dragState.appId].width)
+        );
+        const maxTop = Math.max(
+          0,
+          canvasRect.height -
+            (windowRect ? windowRect.height : sizes[dragState.appId].height)
+        );
+
+        setPositions((current) => ({
+          ...current,
+          [dragState.appId]: {
+            left: clamp(
+              event.clientX - canvasRect.left - dragState.offsetX,
+              0,
+              maxLeft
+            ),
+            top: clamp(
+              event.clientY - canvasRect.top - dragState.offsetY,
+              0,
+              maxTop
+            ),
+          },
+        }));
+      }
+
+      if (resizeState) {
+        const layout = WINDOW_LAYOUTS[resizeState.appId];
+        const currentPosition = positions[resizeState.appId];
+        const maxWidth = Math.max(0, canvasRect.width - currentPosition.left);
+        const maxHeight = Math.max(0, canvasRect.height - currentPosition.top);
+
+        setSizes((current) => ({
+          ...current,
+          [resizeState.appId]: {
+            width: clamp(
+              resizeState.startWidth + (event.clientX - resizeState.startX),
+              layout.minWidth,
+              maxWidth
+            ),
+            height: clamp(
+              resizeState.startHeight + (event.clientY - resizeState.startY),
+              layout.minHeight,
+              maxHeight
+            ),
+          },
+        }));
+      }
     };
 
     const handleMouseUp = () => {
       setDragState(null);
+      setResizeState(null);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -219,7 +307,7 @@ export default function Home() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState]);
+  }, [dragState, resizeState, positions, sizes]);
 
   useEffect(() => {
     if (
@@ -304,6 +392,27 @@ export default function Home() {
       appId,
       offsetX: event.clientX - frameRect.left,
       offsetY: event.clientY - frameRect.top,
+    });
+  };
+
+  const startResizingWindow = (
+    appId: AppId,
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    event.stopPropagation();
+
+    if (window.innerWidth <= 1100) {
+      focusWindow(appId);
+      return;
+    }
+
+    focusWindow(appId);
+    setResizeState({
+      appId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startWidth: sizes[appId].width,
+      startHeight: sizes[appId].height,
     });
   };
 
@@ -507,7 +616,11 @@ export default function Home() {
     }
 
     if (appId === 'cedar') {
-      return <CedarLab />;
+      return (
+        <WindowErrorBoundary>
+          <CedarLab />
+        </WindowErrorBoundary>
+      );
     }
 
     return (
@@ -595,11 +708,13 @@ export default function Home() {
                 style={{
                   top: positions[app.id].top,
                   left: positions[app.id].left,
-                  width: `min(${layout.width}px, calc(100% - 24px))`,
+                  width: `min(${sizes[app.id].width}px, calc(100% - 24px))`,
+                  height: `min(${sizes[app.id].height}px, calc(100% - 24px))`,
                   zIndex: windows[app.id].zIndex,
                 }}
                 onFocus={() => focusWindow(app.id)}
                 onDragStart={(event) => startDraggingWindow(app.id, event)}
+                onResizeStart={(event) => startResizingWindow(app.id, event)}
                 onMinimize={() => minimizeWindow(app.id)}
                 onClose={() => closeWindow(app.id)}
               >

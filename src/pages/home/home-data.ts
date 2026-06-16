@@ -25,11 +25,19 @@ export interface WindowLayout {
   top: number;
   left: number;
   width: number;
+  height: number;
+  minWidth: number;
+  minHeight: number;
 }
 
 export interface WindowPosition {
   top: number;
   left: number;
+}
+
+export interface WindowSize {
+  width: number;
+  height: number;
 }
 
 export interface BootStep {
@@ -48,7 +56,7 @@ export const APP_DEFINITIONS: AppDefinition[] = [
   {
     id: 'cedar',
     icon: 'WASM',
-    label: 'Cedar Lab',
+    label: 'Cedar',
     title: 'C:\\LAB\\CEDAR.EXE',
     command: 'open cedar',
   },
@@ -90,13 +98,62 @@ export const APP_DEFINITIONS: AppDefinition[] = [
 ];
 
 export const WINDOW_LAYOUTS: Record<AppId, WindowLayout> = {
-  about: { top: 36, left: 180, width: 540 },
-  cedar: { top: 54, left: 260, width: 860 },
-  work: { top: 88, left: 260, width: 760 },
-  projects: { top: 160, left: 190, width: 760 },
-  skills: { top: 92, left: 930, width: 420 },
-  contact: { top: 378, left: 930, width: 320 },
-  terminal: { top: 430, left: 120, width: 560 },
+  about: {
+    top: 36,
+    left: 180,
+    width: 540,
+    height: 560,
+    minWidth: 420,
+    minHeight: 320,
+  },
+  cedar: {
+    top: 54,
+    left: 260,
+    width: 860,
+    height: 760,
+    minWidth: 620,
+    minHeight: 460,
+  },
+  work: {
+    top: 88,
+    left: 260,
+    width: 760,
+    height: 700,
+    minWidth: 560,
+    minHeight: 420,
+  },
+  projects: {
+    top: 160,
+    left: 190,
+    width: 860,
+    height: 720,
+    minWidth: 620,
+    minHeight: 460,
+  },
+  skills: {
+    top: 92,
+    left: 930,
+    width: 420,
+    height: 420,
+    minWidth: 320,
+    minHeight: 280,
+  },
+  contact: {
+    top: 378,
+    left: 930,
+    width: 320,
+    height: 260,
+    minWidth: 280,
+    minHeight: 220,
+  },
+  terminal: {
+    top: 430,
+    left: 120,
+    width: 560,
+    height: 320,
+    minWidth: 420,
+    minHeight: 240,
+  },
 };
 
 export const INITIAL_WINDOWS: Record<AppId, WindowState> = {
@@ -126,6 +183,6 @@ export const BOOT_SEQUENCE: BootStep[] = [
   { delay: 420, line: '640K SYSTEM MEMORY ........ OK' },
   { delay: 620, line: 'DETECTING AUTHORIZATION MODULES ........ OK' },
   { delay: 860, line: 'LOADING AWS PROFILE ........ OK' },
-  { delay: 1100, line: 'INITIALIZING CEDAR LAB ........ OK' },
+  { delay: 1100, line: 'INITIALIZING CEDAR TOOLING ........ OK' },
   { delay: 1380, line: 'STARTING COLEOS 95 SHELL ........ OK' },
 ];
