@@ -9,16 +9,17 @@ export function AboutApp(props: CommonWindowProps) {
         <p className="prompt-line">C:\&gt; whoami</p>
         <h1>Cole Foos</h1>
         <p className="hero-subtitle">
-          Software engineer building cloud systems, authorization tooling, and
-          product infrastructure across AWS-backed platforms.
+          Software engineer with 5+ years building large-scale distributed
+          systems at AWS, specializing in identity, authorization, and Rust.
         </p>
         <div className="ascii-panel">
           <p className="prompt-line">C:\&gt; type profile.txt</p>
           <p>
             Based in Arlington, currently building at{' '}
-            {props.currentRole.company}, with experience across AWS, Rust,
-            React, TypeScript, Python, and event-driven systems. I like software
-            that feels sharp, useful, and durable.
+            {props.currentRole.company}. I design low-latency, security-critical
+            services and ship fine-grained access-control infrastructure that
+            other teams and customers build on. I like software that feels
+            sharp, useful, and durable.
           </p>
         </div>
       </div>

@@ -1,44 +1,134 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# foosiee.github.io
 
-## Available Scripts
+Cole Foos's personal portfolio site — a software-engineering resume styled like a
+1990s desktop operating system. Each section (About, Resume, Projects, Skills,
+Contact) opens as a draggable "window," and a built-in Cedar lab runs the
+[Cedar](https://www.cedarpolicy.com/) policy language entirely in the browser via
+WebAssembly.
 
-In the project directory, you can run:
+## Tech stack
 
-### `yarn start`
+- **[Vite](https://vitejs.dev/)** + **[React 18](https://react.dev/)** + **TypeScript**
+- **[Monaco Editor](https://microsoft.github.io/monaco-editor/)** for the in-browser Cedar editor
+- **[Cedar language server](https://github.com/foosiee/cedar)** compiled to WebAssembly (vendored as a git submodule under `vendor/cedar`)
+- **Prettier** for formatting (enforced on build and via a Husky pre-commit hook)
+- Deployed on **Netlify** (build output: `dist/`)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Prerequisites
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- **Node.js 20+** and npm
+- For the Cedar lab WASM build only:
+  - **Rust** (toolchain pinned to `1.95.0` in `rust-toolchain.toml`)
+  - The **`wasm32-unknown-unknown`** target: `rustup target add wasm32-unknown-unknown`
+  - `cargo` available on your `PATH` (the build installs the matching `wasm-bindgen-cli` automatically)
 
-### `yarn test`
+The Cedar lab imports its WASM module from `src/generated/`, which is **not**
+checked into git — it's produced by the build. Run `npm run build` once (which
+requires the Rust toolchain above) to generate it before the dev server can load
+the Cedar lab. After that, `npm run dev` reuses the generated artifacts and only
+rebuilds them when the `vendor/cedar` source changes.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting started
 
-### `yarn build`
+```bash
+# 1. Clone with submodules (or init them after cloning)
+git clone --recurse-submodules https://github.com/foosiee/foosiee.github.io.git
+cd foosiee.github.io
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# If you already cloned without --recurse-submodules:
+git submodule update --init --recursive
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+# 2. Install dependencies
+npm install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# 3. Start the dev server (http://localhost:5173)
+npm run dev
+```
 
-### `yarn eject`
+## Scripts
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+| Command           | Description                                                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`     | Start the Vite dev server with hot-module reload.                                                                                   |
+| `npm start`       | Alias for `npm run dev`.                                                                                                            |
+| `npm run build`   | Production build via `scripts/build.mjs` — rebuilds Cedar WASM (if stale), runs Prettier `--check`, then `vite build` into `dist/`. |
+| `npm run preview` | Serve the production build locally.                                                                                                 |
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### About the build step
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+`npm run build` runs `scripts/build.mjs`, which:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+1. Ensures the Cedar WASM artifacts in `src/generated/cedar-language-server/` are up
+   to date. If the `vendor/cedar` source is newer than the generated output, it
+   rebuilds with `cargo build --release --target wasm32-unknown-unknown` and
+   `wasm-bindgen` (installing the pinned `wasm-bindgen-cli` if needed).
+2. Runs `prettier --check .` (the build fails on any formatting issue).
+3. Runs `vite build`, emitting the static site to `dist/`.
 
-## Learn More
+## Editing content
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Almost all resume content is data-driven from a single file:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### `src/config.json`
+
+- `jobs` — work experience (company, location, title, date, bulleted `details`)
+- `education` — schools (school, location, date, `awarded`, `details`)
+- `skills` — string list rendered as the Skills "tool cloud"
+- `projects` — project cards (title, description, optional `link`)
+- `email`, `linkedin`, `github` — contact links
+- `resume` — path to the downloadable résumé PDF (see below)
+
+Editing this file updates the Resume, Skills, Projects, and Contact windows
+automatically. Type definitions for the config live in `src/types.ts`.
+
+### Résumé PDF
+
+The downloadable résumé lives at `public/Cole_Foos_Resume.pdf`. Files in `public/`
+are served from the site root, so the **Download Resume** button references it with
+the relative path `"/Cole_Foos_Resume.pdf"` (set as `resume` in `config.json`). To
+update the résumé, replace that PDF (keeping the filename, or update the `resume`
+path to match).
+
+### Other copy
+
+A few narrative blurbs are hardcoded in their components rather than `config.json`:
+
+- About-page summary text: `src/pages/home/apps/about-app.tsx`
+- "Extra highlights," "currently exploring," and the boot sequence: `src/pages/home/home-data.ts`
+
+## Project structure
+
+```
+.
+├── index.html                  # App entry; loads fonts and the Netlify contact form
+├── public/                     # Static assets served at the site root
+│   ├── Cole_Foos_Resume.pdf    # Downloadable résumé
+│   ├── favicon.ico
+│   └── robots.txt
+├── scripts/
+│   └── build.mjs               # Cedar WASM rebuild + prettier check + vite build
+├── src/
+│   ├── App.tsx                 # Root component
+│   ├── index.tsx               # React entry point
+│   ├── config.json             # All resume content (data-driven)
+│   ├── types.ts                # Config/Job/Education/Project types
+│   ├── context/                # React context for the config
+│   ├── components/cedarLab/    # Cedar editor + lab UI
+│   ├── lib/                    # Cedar LSP / Monaco glue code
+│   ├── generated/              # Cedar language-server WASM (build output, not committed)
+│   └── pages/home/
+│       ├── home.tsx            # Desktop shell, window management
+│       ├── home-data.ts        # App definitions, window layouts, boot sequence
+│       └── apps/               # About, Resume, Projects, Skills, Contact, Terminal windows
+├── vendor/
+│   └── cedar/                  # Git submodule: Cedar language server source
+├── vite.config.ts              # Vite + React + WASM + top-level-await plugins
+├── rust-toolchain.toml         # Pinned Rust toolchain for the WASM build
+└── netlify.toml                # Deploy config (publishes dist/)
+```
+
+## Deployment
+
+Netlify builds with `rustup target add wasm32-unknown-unknown && npm run build`
+(Node 20) and publishes the `dist/` directory. The contact form is handled by
+Netlify Forms (the hidden `<form name="contact" netlify>` in `index.html`).
