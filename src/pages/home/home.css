@@ -249,15 +249,12 @@
 
 /* about */
 .nr-about {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.85fr);
-  gap: clamp(24px, 6vw, 72px);
   padding: clamp(40px, 7vw, 84px) 0;
   border-bottom: 1px solid var(--line);
 }
 .nr-about-body p {
   margin: 0 0 18px;
-  max-width: 60ch;
+  max-width: 66ch;
   font-size: clamp(1.05rem, 2.1cqi, 1.25rem);
   line-height: 1.5;
   color: var(--ink);
@@ -265,22 +262,6 @@
 }
 .nr-about-body p:last-child {
   margin-bottom: 0;
-}
-.nr-focus {
-  margin: 0;
-  align-self: start;
-  font-size: var(--t-secondary);
-  line-height: 1.6;
-  color: var(--soft);
-}
-.nr-focus-label {
-  display: block;
-  margin-bottom: 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: var(--t-label);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--violet);
 }
 
 /* skills */
@@ -461,6 +442,14 @@
 .nr-detail-problem {
   color: var(--soft) !important;
   font-style: italic;
+}
+/* honest reflection after a writeup — quieter, set off by a hairline */
+.nr-detail-note {
+  margin-top: 18px !important;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--soft) !important;
+  font-size: var(--t-secondary) !important;
 }
 .nr-detail-label {
   margin: 0 0 12px;

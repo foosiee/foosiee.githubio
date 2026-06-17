@@ -18,7 +18,7 @@ function initialTheme(): Theme {
 
 /**
  * The home page — an editorial folio ("The Instrument Folio") with a Paper &
- * Ink (light) / Slate & Citron (dark) theme. Work and experience are
+ * Ink (light) / Workbench (dark) theme. Work and experience are
  * expandable entries; a live project opens its demo in a slide-in drawer.
  * See /DESIGN.md.
  */
@@ -84,10 +84,6 @@ export default function Home() {
               <p key={p.slice(0, 16)}>{p}</p>
             ))}
           </div>
-          <p className="nr-focus">
-            <span className="nr-focus-label">Currently</span>
-            {PROFILE.focus}
-          </p>
         </section>
 
         <section className="nr-section" aria-labelledby="work-h">
@@ -214,9 +210,10 @@ function WorkEntry(props: {
         <div className="nr-detail">
           <div className="nr-detail-main">
             <p className="nr-detail-problem">{p.writeup.problem}</p>
-            {p.writeup.approach.map((para) => (
-              <p key={para.slice(0, 16)}>{para}</p>
-            ))}
+            <p>{p.writeup.approach}</p>
+            {p.writeup.note && (
+              <p className="nr-detail-note">{p.writeup.note}</p>
+            )}
             <div className="nr-detail-actions">
               {p.kind === 'live' && (
                 <button className="nr-run-demo" onClick={props.onRunDemo}>
@@ -230,7 +227,7 @@ function WorkEntry(props: {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Visit site ↗
+                  {p.hrefLabel ?? 'Visit ↗'}
                 </a>
               )}
             </div>
@@ -279,22 +276,23 @@ function ExperienceRow(props: {
         </span>
       </button>
       {open && (
-        <div className={'nr-detail' + (e.deliverables ? '' : ' nr-detail-exp')}>
+        <div className="nr-detail">
           <div className="nr-detail-main">
-            {e.commentary.map((para) => (
-              <p key={para.slice(0, 16)}>{para}</p>
-            ))}
+            <p>{e.commentary}</p>
           </div>
-          {e.deliverables && (
-            <aside className="nr-detail-side">
-              <h4 className="nr-detail-label">Deliverables</h4>
-              <ul className="nr-deliverables">
-                {e.deliverables.map((d) => (
-                  <li key={d}>{d}</li>
-                ))}
-              </ul>
-            </aside>
-          )}
+          <aside className="nr-detail-side">
+            <h4 className="nr-detail-label">Highlights</h4>
+            <ul className="nr-deliverables">
+              {e.highlights.map((h) => (
+                <li key={h}>{h}</li>
+              ))}
+            </ul>
+            <div className="nr-detail-stack">
+              {e.tags.map((t) => (
+                <code key={t}>{t}</code>
+              ))}
+            </div>
+          </aside>
         </div>
       )}
     </li>

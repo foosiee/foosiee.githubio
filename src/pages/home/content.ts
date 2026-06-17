@@ -1,25 +1,21 @@
 /**
  * Editorial content for the home page. Contact links come from config.json
  * (single source of truth); the curated copy, featured selection, and
- * experience framing live here.
+ * experience framing live here. See /DESIGN.md — "The Instrument Folio".
  */
 import config from '../../config.json';
 
 export const PROFILE = {
   name: 'Cole Foos',
-  role: 'Software Development Engineer III',
+  role: 'SDE III · AWS',
   company: 'AWS — Verified Permissions',
   location: 'Arlington, VA',
   tagline:
-    'I build authorization systems — and I make them runnable, not just describable.',
-  bio:
-    'Software engineer working on Amazon Verified Permissions. I like systems where product sense and engineering rigor overlap, and I tend to prove the work by making it run in front of you.',
+    'I build the large-scale distributed systems behind identity and authorization at AWS.',
   about: [
-    'I work on Amazon Verified Permissions — the authorization service and the Cedar policy language behind it. Most of my work lives where a hard systems problem meets a product someone actually has to use.',
-    'I would rather show you something running than describe it. Open the Cedar Language Server in the work below — it’s the same engine that ships in the AWS console, compiled to WASM and running in your browser. That bias, prove it, don’t pitch it, is most of how I work.',
+    'Five-plus years building large-scale, high-throughput distributed systems. These days that means production Rust authorization services — single-digit-millisecond latency, deep platform integrations — and leading cross-team design while staying hands-on across the stack.',
+    'I’d rather show you something than tell you, so one of the projects below actually runs in your browser. Mostly, though, the work is the systems underneath.',
   ],
-  focus:
-    'Cedar language tooling, access-query systems, and making authorization legible.',
   links: {
     github: config.github,
     linkedin: config.linkedin,
@@ -32,8 +28,10 @@ export type FeaturedKind = 'live' | 'external' | 'case';
 
 export interface ProjectWriteup {
   problem: string;
-  approach: string[];
+  approach: string;
   deliverables: string[];
+  /** optional honest reflection shown after the deliverables */
+  note?: string;
 }
 
 export interface FeaturedProject {
@@ -43,8 +41,10 @@ export interface FeaturedProject {
   blurb: string;
   tags: string[];
   href?: string;
+  /** link label for href; defaults to "Visit ↗" */
+  hrefLabel?: string;
   era: string;
-  writeup?: ProjectWriteup;
+  writeup: ProjectWriteup;
 }
 
 export const FEATURED: FeaturedProject[] = [
@@ -53,20 +53,21 @@ export const FEATURED: FeaturedProject[] = [
     title: 'Cedar Language Server',
     kind: 'live',
     blurb:
-      'Authored the Cedar language server (completions, diagnostics, validation) and packaged it to WASM. Powers the AWS AVP console — and runs live, right here.',
+      'Authored the Cedar language server and packaged it to WASM. Powers the AWS AVP console — and runs live, right here.',
     tags: ['Rust', 'WASM', 'Monaco', 'Cedar'],
     era: '2024',
+    href:
+      'https://github.com/cedar-policy/cedar/tree/fdd3e50cd7efb915bf8f6c351e731ae4a1aca6a5/cedar-language-server',
+    hrefLabel: 'view source ↗',
     writeup: {
       problem:
-        'Language tooling is hard to show through a repo link. I wanted the editor experience and the Cedar runtime to be demonstrable as working software — not described.',
-      approach: [
-        'I authored the Cedar language server — completions, hover, diagnostics, validation — then compiled it to WASM and wired it to Monaco so the whole thing runs in a browser.',
-        'The same server powers editor functionality in the AWS Verified Permissions console; this site just runs it client-side so anyone can try it.',
-      ],
+        'Language tooling is hard to show through a repo link. I wanted the editor experience and the Cedar runtime to be something people could actually try, not just read about.',
+      approach:
+        'Built the language server itself — completions, hover, diagnostics, validation — then compiled it to WASM and wired it to Monaco so the whole thing runs in a browser tab. The authorization engine evaluates live; the editor is the same one in the console.',
       deliverables: [
-        'Primary author of the Cedar language server (Rust).',
-        'Browser packaging via WASM + Monaco editor integration.',
-        'Powers editor features in the AWS AVP console and on this page.',
+        'Cedar language server: completions, hover, diagnostics, validation',
+        'WASM + Monaco browser integration',
+        'Ships in the AWS Verified Permissions console',
       ],
     },
   },
@@ -75,20 +76,18 @@ export const FEATURED: FeaturedProject[] = [
     title: 'AVP Access Queries',
     kind: 'case',
     blurb:
-      'Turned Cedar partial-evaluation residuals into indexed lookups so apps can ask "what can Alice see?", not just "can Alice see X?". Three internal services depend on it.',
+      'Turned Cedar partial-evaluation residuals into indexed lookups so apps can ask "what can Alice see?", not just "can Alice see X?".',
     tags: ['Cedar', 'DynamoDB', 'Valkey', 'Lambda'],
     era: '2024',
     writeup: {
       problem:
-        'Apps needed to ask "what can Alice see?" across a whole dataset, not just "can Alice see X?" — much harder than a point check in a policy-driven (not relationship-driven) system.',
-      approach: [
-        'I treated the resource as unknown and partially evaluated the relevant Cedar policies into residual policies.',
-        'From the residuals I extracted constraints — public visibility, ownership — and turned them into indexed queries, instead of scanning every entity and re-running full authorization on each.',
-      ],
+        'Point authorization answers "can Alice view document X?". Several internal apps needed the inverse — "what documents can Alice view?" — across an entire dataset, which a per-entity check can’t answer at scale.',
+      approach:
+        'Treated the resource as unknown and partially evaluated the relevant Cedar policies into residuals, then extracted constraints (public visibility, ownership) into indexed queries instead of scanning every entity and re-running full authorization.',
       deliverables: [
-        'Reusable internal API turning Cedar policy logic into renderable resource lists.',
-        'Storage + query path from partial-evaluation residuals to indexed lookups.',
-        'In production for three internal AWS applications.',
+        'Storage + query path over Cedar residuals',
+        'Principal/resource ingestion APIs for service teams',
+        'Backs three internal AWS services',
       ],
     },
   },
@@ -97,21 +96,25 @@ export const FEATURED: FeaturedProject[] = [
     title: 'Endpoint Authorization Platform',
     kind: 'case',
     blurb:
-      'Owned client-side authorization + OAuth session transport for a Verified Access extension carrying identity over protocols (like DNS) that never had it. Cross-team systems work across Route53, Identity, and client engineering.',
+      'Client-side authorization and session transport for AWS Verified Access — extending zero-trust access to non-HTTP(S) protocols like SSH and RDP, which never carried user identity. Shipped Dec 2024.',
     tags: ['Rust', 'OAuth', 'Zero Trust', 'DNS'],
-    era: '2023',
+    era: '2024',
+    href:
+      'https://aws.amazon.com/blogs/aws/aws-verified-access-now-supports-secure-access-to-resources-over-non-https-protocols/',
+    hrefLabel: 'read the launch ↗',
     writeup: {
       problem:
-        "Protocols like DNS don't carry user identity the way browser OAuth flows do — yet authorization decisions had to be made centrally in AWS, not on the client machine.",
-      approach: [
-        'I owned client-side services that make the authorization decisions, and contributed to the OAuth server converting JWTs into sessions usable over the wire.',
-        'It was a hard cross-team systems problem spanning Route53, AVA, client engineering, and Identity.',
-      ],
+        'Verified Access secured HTTP(S) apps, but protocols like SSH, RDP, JDBC, and ODBC carry no user identity and sat outside policy control. The challenge was extending Cedar-controlled, zero-trust access to them — with decisions made centrally in AWS, not on the client.',
+      approach:
+        'I owned the client-side decision services and contributed the OAuth/session layer that let identity travel with each connection — authenticating through the identity provider and tunneling to a resource by its assigned DNS name, while authorization stayed central.',
       deliverables: [
-        'Client-side authorization services (Rust).',
-        'OAuth session-transport for over-the-wire identity.',
-        'Cross-team design across Route53, Identity, and client engineering.',
+        'Client-side authorization decision services (the connectivity-client path)',
+        'OAuth / session transport carrying identity over the wire',
+        'Cross-team design across Route53, Identity, and client engineering',
+        'A slice launched as AWS Verified Access support for non-HTTP(S) protocols (public preview, Dec 2024)',
       ],
+      note:
+        'This was the heart of my SDE II role at AWS. It was an ambitious program, and not all of it shipped — the broadest vision, authorization over DNS, was cut, and some of my work with it. But a real slice did launch as Verified Access’s non-HTTP(S) support, and it was some of the best systems work I’ve done.',
     },
   },
   {
@@ -119,20 +122,18 @@ export const FEATURED: FeaturedProject[] = [
     title: 'Everest Campaign Orchestration',
     kind: 'case',
     blurb:
-      'Core contributor to an internal Amazon platform modeling marketing campaigns as workflow graphs — send, wait, branch, react — at Amazon scale. The base several later features built on.',
+      'Core contributor to an internal Amazon platform modeling marketing campaigns as workflow graphs — send, wait, branch — at Amazon scale.',
     tags: ['Java', 'Angular', 'Workflow Systems'],
     era: '2022',
     writeup: {
       problem:
-        "Automated marketing campaigns aren't one-step sends. They need a reusable workflow system that can branch, wait, react to state, and coordinate actions across channels.",
-      approach: [
-        'I was a core contributor to a platform that modeled campaigns as graphs of actions — send, wait, branch, follow-up — running at Amazon scale.',
-        'Several later features I worked on (Lifecycle Promotions, Nudging, ML branching) were built directly on this workflow model.',
-      ],
+        'Automated marketing campaigns aren’t one-step sends. Teams needed a reusable system that could branch, wait, react to state, and coordinate across channels — without each team rebuilding the same orchestration.',
+      approach:
+        'Modeled campaigns as graphs of actions (send / wait / branch / follow-up) rather than linear flows, providing the base platform that several later features — ML branching, lifecycle promotions, nudging — were built on.',
       deliverables: [
-        'Workflow-graph platform used for campaigns at Amazon scale.',
-        'The foundation multiple later campaign features were built on.',
-        'Java / Angular / AWS across multiple releases.',
+        'Workflow-graph campaign model',
+        'Multi-channel execution at Amazon scale',
+        'Foundation for downstream feature teams',
       ],
     },
   },
@@ -147,13 +148,13 @@ export const FEATURED: FeaturedProject[] = [
     era: '2021',
     writeup: {
       problem:
-        'Spotify playback and lyrics live in separate places. The goal was to connect them with as little friction as possible.',
-      approach: [
-        'A lightweight consumer web player that pulls live lyrics for whatever track is currently playing.',
-      ],
+        'Spotify playback and lyrics are separate pieces of information. The product challenge was connecting them with as little friction as possible.',
+      approach:
+        'Built a lightweight consumer interface around playback context — a narrow tool with immediate feedback and a clear UX loop, shipped as a public web app.',
       deliverables: [
-        'A live, public web app with a tight playback → lyrics feedback loop.',
-        'A small, focused consumer product rather than an API demo.',
+        'Spotify playback integration',
+        'Live lyric sync to the current track',
+        'Shipped, public web product',
       ],
     },
   },
@@ -164,78 +165,103 @@ export interface ExperienceEntry {
   org: string;
   title: string;
   span: string;
-  /** One-line role descriptor, shown collapsed in the index row. */
+  /** one-line, shown collapsed */
   summary: string;
-  /** Resume-like prose: what the role was and what I drove. */
-  commentary: string[];
-  /** Optional crisp artifacts; omit for entries (e.g. education) that don't need them. */
-  deliverables?: string[];
+  /** resume-style commentary with a point of view, shown expanded */
+  commentary: string;
+  highlights: string[];
+  tags: string[];
 }
 
 export const EXPERIENCE: ExperienceEntry[] = [
   {
-    id: 'aws',
+    id: 'exp-aws-sde3',
     org: 'Amazon Web Services',
-    title: 'SDE III · SDE II',
-    span: 'Nov 2023 — Present',
-    summary:
-      'Authorization platform and zero-trust identity — Cedar, Rust, and the systems behind Verified Permissions.',
-    commentary: [
-      'Authorization is the through-line here. I build features for Amazon Verified Permissions and the Cedar policy language that powers it — the service AWS customers use to pull authorization logic out of their application code and reason about it on its own terms.',
-      'My largest effort has been a managed authn/authz service for a new zero-trust identity system, designed and built in Rust from the ground up. It spans several teams, so beyond the code I own the design breakdowns and drive the implementation across the teams that depend on it — and I sweat the parts that show, like caching tuned to single-digit-millisecond latency.',
+    title: 'SDE III',
+    span: '2025—now',
+    summary: 'Amazon Verified Permissions — managed authorization.',
+    commentary:
+      'I’m on Amazon Verified Permissions, AWS’s managed authorization service. My work spans the Cedar policy language and the service itself — compliance and connectivity, identity integrations, and the query APIs that answer “who can access what?”',
+    highlights: [
+      'Delivered FIPS, PrivateLink, and IPv6 support — broadening compliance reach and secure connectivity for regulated customers',
+      'Built integrations between AVP and AWS IAM Identity Center for a unified path to externalized authorization',
+      'Leading design of internal authorization-query APIs (slated for external launch): “who has access to what?”, “what can a user reach?”',
+      'Authored a Cedar language server — an open-source contribution improving the policy-authoring experience',
     ],
-    deliverables: [
-      'Building new features for Amazon Verified Permissions.',
-      'Designed and built a Rust managed authn/authz service for a new zero-trust identity system.',
-      'Vendored internal Rust libraries for other AWS service teams integrating with the service.',
-      'Engineered caching that delivered single-digit-millisecond response times.',
-      'Wrote design breakdowns and drove implementation across multiple teams.',
-    ],
+    tags: ['Rust', 'Cedar', 'AWS', 'Authorization'],
   },
   {
-    id: 'amazon',
+    id: 'exp-aws-sde2',
+    org: 'Amazon Web Services',
+    title: 'SDE II',
+    span: '2023—2025',
+    summary: 'Zero-trust endpoint authorization · AWS Verified Access.',
+    commentary:
+      'The role behind the Endpoint Authorization Platform in selected work. I built the authorization core — a Rust service in the request path — for extending AWS Verified Access’s zero-trust model to new kinds of endpoints, where latency and clean cross-team integration were everything. Not all of the program shipped, but the part that did was some of the best systems work I’ve done.',
+    highlights: [
+      'Designed and built a Rust-based managed authn/authz service for the zero-trust access program behind Verified Access',
+      'Engineered caching that achieved single-digit-millisecond response times at scale',
+      'Vendored internal Rust libraries adopted by other AWS service teams, cutting duplicate work',
+      'Drove cross-team design, breaking work into task plans that aligned multiple teams',
+    ],
+    tags: ['Rust', 'Zero-Trust', 'Caching', 'AWS'],
+  },
+  {
+    id: 'exp-amazon-sde2',
     org: 'Amazon',
-    title: 'SDE II · SDE I',
-    span: 'May 2021 — Nov 2023',
-    summary: 'Lifecycle marketing tooling at consumer scale.',
-    commentary: [
-      'I worked on a drag-and-drop lifecycle-marketing platform serving millions of customers a day — the kind of system where a small correctness bug or a slow query shows up immediately, at scale.',
-      'The work ran the full stack of that problem: customer-facing features, a cross-team ML capability that automatically picks the best experience for each customer, large storage and query optimizations across S3, Athena, and Glue, and the safety automation that halts campaigns the moment they misbehave.',
+    title: 'SDE II',
+    span: '2022—2023',
+    summary: 'Everest — lifecycle marketing platform.',
+    commentary:
+      'I built features for Everest, the drag-and-drop platform marketers used to compose lifecycle journeys for millions of people a day, gravitating to the parts that made it smarter and safer.',
+    highlights: [
+      'Engineered features for Everest, a drag-and-drop lifecycle marketing platform personalizing experiences for millions of users/day',
+      'Developed a cross-team ML feature that auto-selects the best-performing customer experience',
+      'Cut S3, Athena, and Glue utilization via storage reductions, query optimization, and partitioning',
+      'Built automation to halt under-performing or malfunctioning campaigns; mentored teammates and ran on-call',
     ],
-    deliverables: [
-      'Built features for a drag-and-drop lifecycle marketing tool serving millions of users per day.',
-      'Developed a cross-team ML feature that automatically selects the best customer experience.',
-      'Cut S3, Athena, and Glue utilization via storage reductions, query optimization, and partitioning.',
-      'Built automation to halt under-performing or malfunctioning campaigns.',
-      'Built a notification system (hundreds of weekly alerts) and a high-capacity processor for millions of events.',
-    ],
+    tags: ['Java', 'Angular', 'ML', 'AWS'],
   },
   {
-    id: 'onpoint',
-    org: 'Onpoint Group',
-    title: 'Software Developer',
-    span: 'Feb 2019 — Feb 2021',
-    summary: 'Internal apps, automation, and cloud integrations.',
-    commentary: [
-      'My first engineering role — internal applications, automation, and cloud integrations, often as the person who took a manual process and made it run itself.',
-      'The work that stuck with me was an invoice-automation pipeline built on Amazon Textract and Rekognition and wired into Salesforce, processing hundreds of invoices a day, plus performance work on Azure Cosmos DB that cut load times tenfold.',
+    id: 'exp-amazon-sde1',
+    org: 'Amazon',
+    title: 'SDE I',
+    span: '2021—2022',
+    summary: 'Everest — lifecycle marketing platform · remote.',
+    commentary:
+      'My first full-time role, on Everest (the lifecycle marketing platform), focused on the event and notification plumbing that drove engagement at scale.',
+    highlights: [
+      'Designed a notification system delivering hundreds of weekly alerts on campaign progress, engagement, and issues',
+      'Built a high-capacity event processor handling millions of events to engage users at key lifecycle milestones',
     ],
-    deliverables: [
-      'Invoice automation on Amazon Textract + Rekognition and Salesforce, processing hundreds of invoices/day.',
-      'Web-accessible Power BI dashboards for internal and external use.',
-      'Tuned Azure Cosmos DB request efficiency for a 10× reduction in load times.',
-      'Built a CI/CD pipeline with GitHub Actions and integrated third-party CRMs.',
-    ],
+    tags: ['Java', 'AWS', 'Distributed Systems'],
   },
   {
-    id: 'toledo',
-    org: 'University of Toledo',
-    title: 'B.S. Computer Science',
-    span: '2016 — 2020',
-    summary: 'Bachelor of Computer Science, Cum Laude.',
-    commentary: [
-      'B.S. in Computer Science, graduated Cum Laude. The foundation: algorithms, systems, and the habit of digging until I actually understand how something works.',
+    id: 'exp-onpoint',
+    org: 'OnPoint Group',
+    title: 'Software Developer Intern',
+    span: '2019—2021',
+    summary: 'Automation, cloud, and integrations.',
+    commentary:
+      'Where I started — a small team where I owned things end to end across automation, cloud, and integrations.',
+    highlights: [
+      'Built an invoice-automation system (Textract, Rekognition, Salesforce) processing hundreds of invoices/day; tuned Azure Cosmos DB for a 10× page-load reduction',
+      'Delivered mobile-app backend services, a CI/CD pipeline in GitHub Actions, Power BI dashboards, and CRM integrations',
     ],
+    tags: ['Azure', 'Textract', 'Salesforce', 'CI/CD'],
+  },
+  {
+    id: 'exp-amazon-intern',
+    org: 'Amazon',
+    title: 'SDE Intern',
+    span: '2020',
+    summary: 'Marketing campaigns · remote.',
+    commentary:
+      'A summer on the marketing-campaigns team, building tooling for the people who ran them.',
+    highlights: [
+      'Designed and shipped a debugger tool letting marketers see a customer’s position within their campaigns',
+    ],
+    tags: ['Java', 'AWS'],
   },
 ];
 
