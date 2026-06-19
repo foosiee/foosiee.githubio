@@ -54,30 +54,32 @@ export function configureCedarMonaco(monaco: typeof Monaco) {
     ],
   });
 
+  // A single dark editor "screen" used in both light and dark page modes
+  // (copied from the Workbench palette). Cobalt cursor; cool syntax.
   monaco.editor.defineTheme('cedar-os', {
     base: 'vs-dark',
     inherit: true,
     rules: [
-      { token: 'keyword', foreground: '7dcfff', fontStyle: 'bold' },
-      { token: 'keyword.declaration', foreground: 'ffbf69', fontStyle: 'bold' },
-      { token: 'variable.predefined', foreground: 'ffd166' },
-      { token: 'type.identifier', foreground: 'c3e88d' },
-      { token: 'string', foreground: '8dfc8d' },
-      { token: 'comment', foreground: '5c7c5c' },
-      { token: 'number', foreground: 'f78c6c' },
-      { token: 'operator', foreground: 'd4d4d4' },
+      { token: 'keyword', foreground: 'c4a7f5', fontStyle: 'bold' },
+      { token: 'keyword.declaration', foreground: 'c4a7f5', fontStyle: 'bold' },
+      { token: 'variable.predefined', foreground: '8fb3ff' },
+      { token: 'type.identifier', foreground: '7fd6e0' },
+      { token: 'string', foreground: '88e0a6' },
+      { token: 'comment', foreground: '7b85a3' },
+      { token: 'number', foreground: 'c4a7f5' },
+      { token: 'operator', foreground: '8fb3ff' },
     ],
     colors: {
-      'editor.background': '#041704',
-      'editor.foreground': '#6efb8a',
-      'editorCursor.foreground': '#fff4a8',
-      'editor.lineHighlightBackground': '#0b2a0b',
-      'editorLineNumber.foreground': '#4b8f4b',
-      'editorLineNumber.activeForeground': '#d7ffd7',
-      'editor.selectionBackground': '#174717',
-      'editor.inactiveSelectionBackground': '#103010',
-      'editorIndentGuide.background1': '#103010',
-      'editorIndentGuide.activeBackground1': '#2f6b2f',
+      'editor.background': '#21242e',
+      'editor.foreground': '#e6e9f0',
+      'editorCursor.foreground': '#4263eb',
+      'editor.lineHighlightBackground': '#262a36',
+      'editorLineNumber.foreground': '#6b7494',
+      'editorLineNumber.activeForeground': '#e6e9f0',
+      'editor.selectionBackground': '#34406b',
+      'editor.inactiveSelectionBackground': '#2b3147',
+      'editorIndentGuide.background1': '#2b2f3c',
+      'editorIndentGuide.activeBackground1': '#4a5170',
     },
   });
 }

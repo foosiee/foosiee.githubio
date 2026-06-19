@@ -14,7 +14,7 @@ import {
   registerCedarEditorService,
   updateCedarDiagnostics,
 } from '../../lib/cedarEditorService';
-import './cedarLab.css';
+import './cedarDemo.css';
 
 type CedarModule = typeof import('@cedar-policy/cedar-wasm');
 type CedarDocumentId = 'schema' | 'policies' | 'entities' | 'request';
@@ -125,10 +125,6 @@ function CodeEditor(props: {
     editor: Monaco.editor.IStandaloneCodeEditor,
     monaco: typeof Monaco
   ) => void;
-  onUnmount?: (
-    editor: Monaco.editor.IStandaloneCodeEditor,
-    monaco: typeof Monaco
-  ) => void;
   onMountError?: (message: string) => void;
 }) {
   const handleMount: OnMount = (editor, monaco) => {
@@ -170,11 +166,10 @@ function CodeEditor(props: {
           value={props.value}
           onChange={(value) => props.onChange(value ?? '')}
           height={props.height ?? 260}
-          onUnmount={props.onUnmount}
           options={{
             automaticLayout: true,
             minimap: { enabled: false },
-            fontFamily: 'IBM Plex Mono, Courier New, monospace',
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
             fontSize: 14,
             scrollBeyondLastLine: false,
             roundedSelection: false,
@@ -183,6 +178,10 @@ function CodeEditor(props: {
             lineNumbersMinChars: 3,
             renderLineHighlight: 'line',
             tabSize: 2,
+            // Render hover / suggestion / parameter-hint widgets in a fixed
+            // layer so they escape the editor shell's (and drawer's) overflow
+            // clipping instead of being cut off at the editor bounds.
+            fixedOverflowWidgets: true,
           }}
           theme="cedar-os"
         />
@@ -191,7 +190,7 @@ function CodeEditor(props: {
   );
 }
 
-export default function CedarLab() {
+export default function CedarDemo() {
   const monacoRef = useRef<typeof Monaco | null>(null);
   const schemaEditorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(
     null
@@ -439,17 +438,18 @@ export default function CedarLab() {
   ];
 
   return (
-    <div className="cedar-lab">
+    <div className="cedar-demo">
       <div className="cedar-toolbar">
         <div>
-          <p className="prompt-line">C:\&gt; launch cedar.exe</p>
+          <p className="cedar-kicker">Cedar Language Server</p>
           <p className="cedar-runtime-copy">
-            In-browser Cedar editor running through WASM.
+            The real language server, compiled to WASM and running in your
+            browser. Edit the policy or schema and watch it validate live.
           </p>
         </div>
         <div className="cedar-toolbar-actions">
           <button
-            className="win-button primary"
+            className="cedar-btn cedar-btn-primary"
             onClick={() => {
               if (!cedar) {
                 return;
@@ -473,7 +473,9 @@ export default function CedarLab() {
                     principal: parsedRequest.principal,
                     action: parsedRequest.action,
                     resource: parsedRequest.resource,
-                    context: parsedRequest.context ?? {},
+                    context: (parsedRequest.context ?? {}) as Parameters<
+                      typeof cedar.isAuthorized
+                    >[0]['context'],
                     validateRequest: true,
                   })
                 );
@@ -490,10 +492,10 @@ export default function CedarLab() {
           >
             Evaluate
           </button>
-          <button className="win-button" onClick={formatPolicies}>
+          <button className="cedar-btn" onClick={formatPolicies}>
             Format
           </button>
-          <button className="win-button" onClick={resetSamples}>
+          <button className="cedar-btn" onClick={resetSamples}>
             Reset
           </button>
         </div>
@@ -584,15 +586,6 @@ export default function CedarLab() {
                       }
                     }}
                     onMountError={setLanguageServiceError}
-                    onUnmount={(editor) => {
-                      if (schemaEditorRef.current === editor) {
-                        schemaEditorRef.current = null;
-                      }
-
-                      if (policyEditorRef.current === editor) {
-                        policyEditorRef.current = null;
-                      }
-                    }}
                   />
                 </div>
               );

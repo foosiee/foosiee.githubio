@@ -1,774 +1,352 @@
-import React, {
-  FormEvent,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import ConfigContext from '../../context/configContext';
-import {
-  APP_DEFINITIONS,
-  BOOT_SEQUENCE,
-  INITIAL_WINDOWS,
-  WINDOW_LAYOUTS,
-  WindowPosition,
-  WindowSize,
-  WindowState,
-  AppId,
-} from './home-data';
-import {
-  buildProjectExplorerFolders,
-  formatExplorerTree,
-} from './project-data';
-import { buildResumeExplorerFolders } from './resume-data';
-import { AboutApp } from './apps/about-app';
-import { ContactApp } from './apps/contact-app';
-import { ProjectsApp } from './apps/projects-app';
-import { ResumeApp } from './apps/resume-app';
-import { SkillsApp } from './apps/skills-app';
-import { TerminalApp } from './apps/terminal-app';
-import CedarLab from '../../components/cedarLab/cedarLab';
-import type { ProjectPanelTab } from './project-data';
-
+import React, { useEffect, useState } from 'react';
 import './home.css';
+import { EXPERIENCE, FEATURED, PROFILE, SKILLS } from './content';
+import type { ExperienceEntry, FeaturedProject } from './content';
+import CedarDemo from '../../components/cedarDemo/cedarDemo';
 
-interface DragState {
-  appId: AppId;
-  offsetX: number;
-  offsetY: number;
+type Theme = 'light' | 'dark';
+
+/** Initial theme: a stored choice wins, else the OS preference (dark default). */
+function initialTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+  const stored = window.localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') return stored;
+  return window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark';
 }
 
-interface ResizeState {
-  appId: AppId;
-  startX: number;
-  startY: number;
-  startWidth: number;
-  startHeight: number;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function buildInitialPositions(): Record<AppId, WindowPosition> {
-  return Object.keys(WINDOW_LAYOUTS).reduce((positions, appId) => {
-    const typedAppId = appId as AppId;
-
-    return {
-      ...positions,
-      [typedAppId]: {
-        top: WINDOW_LAYOUTS[typedAppId].top,
-        left: WINDOW_LAYOUTS[typedAppId].left,
-      },
-    };
-  }, {} as Record<AppId, WindowPosition>);
-}
-
-function buildInitialSizes(): Record<AppId, WindowSize> {
-  return Object.keys(WINDOW_LAYOUTS).reduce((sizes, appId) => {
-    const typedAppId = appId as AppId;
-
-    return {
-      ...sizes,
-      [typedAppId]: {
-        width: WINDOW_LAYOUTS[typedAppId].width,
-        height: WINDOW_LAYOUTS[typedAppId].height,
-      },
-    };
-  }, {} as Record<AppId, WindowSize>);
-}
-
-function WindowFrame(props: {
-  appId: AppId;
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-  active?: boolean;
-  dragging?: boolean;
-  style?: React.CSSProperties;
-  onFocus?: () => void;
-  onDragStart?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  onResizeStart?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  onMinimize?: () => void;
-  onClose?: () => void;
-}) {
-  return (
-    <section
-      data-window-id={props.appId}
-      className={`window-frame${props.className ? ` ${props.className}` : ''}${
-        props.active ? ' active' : ''
-      }${props.dragging ? ' dragging' : ''}`}
-      style={props.style}
-      onMouseDown={props.onFocus}
-    >
-      <div className="window-titlebar" onMouseDown={props.onDragStart}>
-        <div className="titlebar-text">{props.title}</div>
-        <div className="titlebar-actions">
-          <button
-            aria-label="Minimize window"
-            onMouseDown={(event) => event.stopPropagation()}
-            onClick={props.onMinimize}
-          >
-            _
-          </button>
-          <button
-            aria-label="Close window"
-            onMouseDown={(event) => event.stopPropagation()}
-            onClick={props.onClose}
-          >
-            X
-          </button>
-        </div>
-      </div>
-      <div className="window-body">{props.children}</div>
-      <div
-        className="window-resize-handle"
-        onMouseDown={props.onResizeStart}
-        aria-hidden="true"
-      />
-    </section>
-  );
-}
-
-class WindowErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; message: string | null }
-> {
-  state = { hasError: false, message: null };
-
-  static getDerivedStateFromError(error: unknown) {
-    return {
-      hasError: true,
-      message:
-        error instanceof Error ? error.message : 'Window failed to render.',
-    };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="explorer-empty">
-          <p className="prompt-line">C:\&gt; app /crash</p>
-          <p className="supporting-text">{this.state.message}</p>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
+/**
+ * The home page — an editorial folio ("The Instrument Folio") with a Paper &
+ * Ink (light) / Workbench (dark) theme. Work and experience are
+ * expandable entries; a live project opens its demo in a slide-in drawer.
+ * See /DESIGN.md.
+ */
 export default function Home() {
-  const config = useContext(ConfigContext);
-  const canvasRef = useRef<HTMLDivElement | null>(null);
-  const projectFolders = useMemo(() => buildProjectExplorerFolders(), []);
-  const resumeFolders = useMemo(() => buildResumeExplorerFolders(config.jobs), [
-    config.jobs,
-  ]);
-  const [windows, setWindows] = useState<Record<AppId, WindowState>>(
-    INITIAL_WINDOWS
-  );
-  const [positions, setPositions] = useState<Record<AppId, WindowPosition>>(
-    buildInitialPositions
-  );
-  const [sizes, setSizes] = useState<Record<AppId, WindowSize>>(
-    buildInitialSizes
-  );
-  const [dragState, setDragState] = useState<DragState | null>(null);
-  const [resizeState, setResizeState] = useState<ResizeState | null>(null);
-  const [, setNextZIndex] = useState(5);
-  const [terminalInput, setTerminalInput] = useState('');
-  const [startOpen, setStartOpen] = useState(false);
-  const [selectedProjectFolderId, setSelectedProjectFolderId] = useState(
-    projectFolders[0]?.id ?? 'work-tooling'
-  );
-  const [selectedProjectEntryId, setSelectedProjectEntryId] = useState(
-    projectFolders[0]?.entries[0]?.id ?? ''
-  );
-  const [selectedProjectPanel, setSelectedProjectPanel] = useState<
-    ProjectPanelTab
-  >('overview');
-  const [bootLines, setBootLines] = useState<string[]>([]);
-  const [bootComplete, setBootComplete] = useState(false);
-  const [terminalHistory, setTerminalHistory] = useState<string[]>([
-    'COLEOS 95 command shell ready.',
-    'Type HELP for commands or OPEN ABOUT to launch a window.',
-  ]);
+  // First (live) project open by default, so a skimmer sees something runs.
+  const [openId, setOpenId] = useState<string | null>(FEATURED[0].id);
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+  const toggle = (id: string) => setOpenId((cur) => (cur === id ? null : id));
 
+  // Reflect the theme on <html> (the inline script in index.html set it
+  // pre-paint; this keeps it in sync on toggle) and remember the choice.
   useEffect(() => {
-    const timeouts = BOOT_SEQUENCE.map((step, index) =>
-      window.setTimeout(() => {
-        setBootLines((current) => [...current, step.line]);
-
-        if (index === BOOT_SEQUENCE.length - 1) {
-          window.setTimeout(() => {
-            setBootComplete(true);
-          }, 380);
-        }
-      }, step.delay)
-    );
-
-    return () => {
-      timeouts.forEach((timeout) => window.clearTimeout(timeout));
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!dragState && !resizeState) {
-      return undefined;
-    }
-
-    const previousCursor = document.body.style.cursor;
-    const previousUserSelect = document.body.style.userSelect;
-
-    document.body.style.cursor = 'grabbing';
-    document.body.style.userSelect = 'none';
-
-    const handleMouseMove = (event: MouseEvent) => {
-      const canvas = canvasRef.current;
-
-      if (!canvas) {
-        return;
-      }
-
-      const canvasRect = canvas.getBoundingClientRect();
-
-      if (dragState) {
-        const windowElement = canvas.querySelector(
-          `[data-window-id="${dragState.appId}"]`
-        ) as HTMLElement | null;
-        const windowRect = windowElement
-          ? windowElement.getBoundingClientRect()
-          : null;
-        const maxLeft = Math.max(
-          0,
-          canvasRect.width -
-            (windowRect ? windowRect.width : sizes[dragState.appId].width)
-        );
-        const maxTop = Math.max(
-          0,
-          canvasRect.height -
-            (windowRect ? windowRect.height : sizes[dragState.appId].height)
-        );
-
-        setPositions((current) => ({
-          ...current,
-          [dragState.appId]: {
-            left: clamp(
-              event.clientX - canvasRect.left - dragState.offsetX,
-              0,
-              maxLeft
-            ),
-            top: clamp(
-              event.clientY - canvasRect.top - dragState.offsetY,
-              0,
-              maxTop
-            ),
-          },
-        }));
-      }
-
-      if (resizeState) {
-        const layout = WINDOW_LAYOUTS[resizeState.appId];
-        const currentPosition = positions[resizeState.appId];
-        const maxWidth = Math.max(0, canvasRect.width - currentPosition.left);
-        const maxHeight = Math.max(0, canvasRect.height - currentPosition.top);
-
-        setSizes((current) => ({
-          ...current,
-          [resizeState.appId]: {
-            width: clamp(
-              resizeState.startWidth + (event.clientX - resizeState.startX),
-              layout.minWidth,
-              maxWidth
-            ),
-            height: clamp(
-              resizeState.startHeight + (event.clientY - resizeState.startY),
-              layout.minHeight,
-              maxHeight
-            ),
-          },
-        }));
-      }
-    };
-
-    const handleMouseUp = () => {
-      setDragState(null);
-      setResizeState(null);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.body.style.cursor = previousCursor;
-      document.body.style.userSelect = previousUserSelect;
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragState, resizeState, positions, sizes]);
-
-  useEffect(() => {
-    if (
-      projectFolders.length > 0 &&
-      !projectFolders.some((folder) => folder.id === selectedProjectFolderId)
-    ) {
-      setSelectedProjectFolderId(projectFolders[0].id);
-      setSelectedProjectEntryId(projectFolders[0].entries[0]?.id ?? '');
-    }
-  }, [projectFolders, selectedProjectFolderId]);
-
-  useEffect(() => {
-    const folder =
-      projectFolders.find((item) => item.id === selectedProjectFolderId) ??
-      projectFolders[0];
-    const entry = folder?.entries.find(
-      (item) => item.id === selectedProjectEntryId
-    );
-
-    if (!folder || folder.entries.length === 0) {
-      return;
-    }
-
-    if (!entry) {
-      setSelectedProjectEntryId(folder.entries[0].id);
-    }
-  }, [projectFolders, selectedProjectFolderId, selectedProjectEntryId]);
-
-  useEffect(() => {
-    setSelectedProjectPanel('overview');
-  }, [selectedProjectEntryId]);
-
-  const currentRole = config.jobs[0];
-
-  const promoteWindow = (appId: AppId, updates?: Partial<WindowState>) => {
-    setNextZIndex((value) => {
-      setWindows((current) => ({
-        ...current,
-        [appId]: {
-          ...current[appId],
-          ...updates,
-          zIndex: value,
-        },
-      }));
-
-      return value + 1;
-    });
-  };
-
-  const openWindow = (appId: AppId) => {
-    promoteWindow(appId, {
-      open: true,
-      minimized: false,
-    });
-    setStartOpen(false);
-  };
-
-  const focusWindow = (appId: AppId) => {
-    promoteWindow(appId);
-  };
-
-  const startDraggingWindow = (
-    appId: AppId,
-    event: React.MouseEvent<HTMLDivElement>
-  ) => {
-    if (window.innerWidth <= 1100) {
-      focusWindow(appId);
-      return;
-    }
-
-    const frameElement = event.currentTarget
-      .parentElement as HTMLElement | null;
-
-    if (!frameElement) {
-      return;
-    }
-
-    const frameRect = frameElement.getBoundingClientRect();
-
-    focusWindow(appId);
-    setDragState({
-      appId,
-      offsetX: event.clientX - frameRect.left,
-      offsetY: event.clientY - frameRect.top,
-    });
-  };
-
-  const startResizingWindow = (
-    appId: AppId,
-    event: React.MouseEvent<HTMLDivElement>
-  ) => {
-    event.stopPropagation();
-
-    if (window.innerWidth <= 1100) {
-      focusWindow(appId);
-      return;
-    }
-
-    focusWindow(appId);
-    setResizeState({
-      appId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startWidth: sizes[appId].width,
-      startHeight: sizes[appId].height,
-    });
-  };
-
-  const minimizeWindow = (appId: AppId) => {
-    setWindows((current) => ({
-      ...current,
-      [appId]: {
-        ...current[appId],
-        minimized: true,
-      },
-    }));
-  };
-
-  const closeWindow = (appId: AppId) => {
-    setWindows((current) => ({
-      ...current,
-      [appId]: {
-        ...current[appId],
-        open: false,
-        minimized: false,
-      },
-    }));
-  };
-
-  const activeAppId = useMemo(() => {
-    return Object.entries(windows).reduce<AppId | null>((activeId, entry) => {
-      const appId = entry[0] as AppId;
-      const windowState = entry[1];
-
-      if (!windowState.open || windowState.minimized) {
-        return activeId;
-      }
-
-      if (!activeId || windowState.zIndex > windows[activeId].zIndex) {
-        return appId;
-      }
-
-      return activeId;
-    }, null);
-  }, [windows]);
-
-  const visibleWindows = APP_DEFINITIONS.filter((app) => {
-    return windows[app.id].open && !windows[app.id].minimized;
-  }).sort((a, b) => windows[a.id].zIndex - windows[b.id].zIndex);
-
-  const openWindows = APP_DEFINITIONS.filter((app) => windows[app.id].open);
-
-  const resolveAppFromToken = (token: string): AppId | null => {
-    const normalized = token
-      .toLowerCase()
-      .replace('.exe', '')
-      .replace('.com', '');
-    const match = APP_DEFINITIONS.find((app) => {
-      return (
-        app.id === normalized || app.label.toLowerCase().includes(normalized)
-      );
-    });
-
-    return match ? match.id : null;
-  };
-
-  const runTerminalCommand = (rawCommand: string) => {
-    const command = rawCommand.trim();
-
-    if (!command) {
-      return;
-    }
-
-    const normalized = command.toLowerCase();
-    const parts = normalized.split(/\s+/);
-    const nextHistory = [`C:\\>${command}`];
-
-    if (normalized === 'help') {
-      nextHistory.push(
-        'Commands: HELP, DIR, TREE [RESUME|PROJECTS], WHOAMI, OPEN <APP>, CLOSE <APP>, RESUME, CONTACT, PROJECTS, STATUS, CLEAR'
-      );
-    } else if (normalized === 'dir' || normalized === 'apps') {
-      nextHistory.push(
-        'ABOUT.TXT  CEDAR.EXE  RESUME.EXE  PROJECTS.EXE  SKILLS.SYS  CONTACT.CFG  PROMPT.COM'
-      );
-    } else if (parts[0] === 'tree') {
-      const target = parts[1] ?? 'all';
-      const lines =
-        target === 'resume'
-          ? formatExplorerTree(resumeFolders)
-          : target === 'projects'
-          ? formatExplorerTree(projectFolders)
-          : [
-              ...formatExplorerTree(resumeFolders),
-              '',
-              ...formatExplorerTree(projectFolders),
-            ];
-
-      nextHistory.push(...lines);
-    } else if (normalized === 'whoami') {
-      nextHistory.push(
-        'Cole Foos | software engineer | web, cloud, product engineering'
-      );
-    } else if (normalized === 'resume') {
-      openWindow('work');
-      nextHistory.push('Launching RESUME.EXE...');
-    } else if (normalized === 'projects') {
-      openWindow('projects');
-      nextHistory.push('Opening PROJECTS.EXE...');
-    } else if (normalized === 'contact') {
-      openWindow('contact');
-      nextHistory.push(`Opening CONTACT.CFG... email: ${config.email}`);
-    } else if (normalized === 'status') {
-      nextHistory.push(
-        `Desktop online | windows ${openWindows.length} open | cedar ${
-          windows.cedar.open ? 'loaded' : 'available'
-        } | shell ready`
-      );
-    } else if (parts[0] === 'open' && parts[1]) {
-      const appId = resolveAppFromToken(parts.slice(1).join(' '));
-
-      if (appId) {
-        openWindow(appId);
-        nextHistory.push(`Launching ${appId.toUpperCase()}...`);
-      } else {
-        nextHistory.push('File not found. Try DIR or HELP.');
-      }
-    } else if (parts[0] === 'close' && parts[1]) {
-      const appId = resolveAppFromToken(parts.slice(1).join(' '));
-
-      if (appId) {
-        closeWindow(appId);
-        nextHistory.push(`Closed ${appId.toUpperCase()}.`);
-      } else {
-        nextHistory.push('Close target not found.');
-      }
-    } else if (normalized === 'clear') {
-      setTerminalHistory([
-        'Terminal buffer cleared.',
-        'Type HELP for commands.',
-      ]);
-      return;
-    } else {
-      nextHistory.push('Bad command or file name. Type HELP.');
-    }
-
-    setTerminalHistory((current) => [...current, ...nextHistory]);
-  };
-
-  const handleTerminalSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    runTerminalCommand(terminalInput);
-    setTerminalInput('');
-  };
-
-  const renderWindowContent = (appId: AppId) => {
-    if (appId === 'about') {
-      return (
-        <AboutApp
-          config={config}
-          currentRole={currentRole}
-          openWindow={openWindow}
-        />
-      );
-    }
-
-    if (appId === 'work') {
-      return (
-        <ResumeApp
-          config={config}
-          currentRole={currentRole}
-          openWindow={openWindow}
-        />
-      );
-    }
-
-    if (appId === 'projects') {
-      return (
-        <ProjectsApp
-          config={config}
-          currentRole={currentRole}
-          openWindow={openWindow}
-          projectFolders={projectFolders}
-          selectedProjectFolderId={selectedProjectFolderId}
-          selectedProjectEntryId={selectedProjectEntryId}
-          selectedProjectPanel={selectedProjectPanel}
-          setSelectedProjectFolderId={setSelectedProjectFolderId}
-          setSelectedProjectEntryId={setSelectedProjectEntryId}
-          setSelectedProjectPanel={setSelectedProjectPanel}
-        />
-      );
-    }
-
-    if (appId === 'skills') {
-      return <SkillsApp config={config} />;
-    }
-
-    if (appId === 'contact') {
-      return (
-        <ContactApp
-          config={config}
-          currentRole={currentRole}
-          openWindow={openWindow}
-        />
-      );
-    }
-
-    if (appId === 'cedar') {
-      return (
-        <WindowErrorBoundary>
-          <CedarLab />
-        </WindowErrorBoundary>
-      );
-    }
-
-    return (
-      <TerminalApp
-        terminalHistory={terminalHistory}
-        terminalInput={terminalInput}
-        setTerminalInput={setTerminalInput}
-        handleTerminalSubmit={handleTerminalSubmit}
-      />
-    );
-  };
-
-  const clockValue = new Date().toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
 
   return (
-    <main className="home-page">
-      {!bootComplete ? (
-        <div className="startup-screen" aria-hidden="true">
-          <div className="startup-shell">
-            <p className="startup-brand">COLEOS 95 STARTUP</p>
-            <div className="startup-console">
-              {bootLines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-              <p className="startup-cursor">_</p>
-            </div>
-            <div className="startup-progress">
-              <div
-                className="startup-progress-bar"
-                style={{
-                  width: `${Math.max(
-                    12,
-                    (bootLines.length / BOOT_SEQUENCE.length) * 100
-                  )}%`,
-                }}
-              />
-            </div>
-            <p className="startup-copy">Booting portfolio desktop...</p>
+    <div className="v-noir">
+      <div className="nr-page">
+        <header className="nr-mast">
+          <div className="nr-mast-main nr-rise" style={delay(0)}>
+            <p className="nr-eyebrow">Software engineer · {PROFILE.location}</p>
+            <h1>{PROFILE.name}</h1>
+            <p className="nr-tagline">{PROFILE.tagline}</p>
           </div>
-        </div>
-      ) : null}
-
-      <header className="boot-header">
-        <div className="boot-status">
-          <span className="status-dot" />
-          <span>COLEOS 95</span>
-        </div>
-        <div className="boot-menu">
-          <span>FILE</span>
-          <span>WINDOWS</span>
-          <span>RUN</span>
-          <span>HELP</span>
-        </div>
-      </header>
-
-      <section className="desktop-shell">
-        <aside className="desktop-icons">
-          {APP_DEFINITIONS.map((app) => (
+          <div className="nr-mast-side nr-rise" style={delay(1)}>
             <button
-              key={app.id}
-              className="desktop-icon"
-              onClick={() => openWindow(app.id)}
+              type="button"
+              className="nr-theme-toggle"
+              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              aria-label={`Switch to ${
+                theme === 'dark' ? 'light' : 'dark'
+              } theme`}
             >
-              <span className="desktop-icon-badge">{app.icon}</span>
-              <span>{app.label}</span>
+              <span className="nr-theme-toggle-glyph" aria-hidden>
+                {theme === 'dark' ? '☀' : '☾'}
+              </span>
+              {theme === 'dark' ? 'Light' : 'Dark'}
             </button>
-          ))}
-        </aside>
+            <p className="nr-now">
+              <span>Now</span>
+              {PROFILE.company}
+            </p>
+            <nav className="nr-links">
+              <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+                Résumé
+              </a>
+              <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+              <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+              <a href={`mailto:${PROFILE.links.email}`}>Email</a>
+            </nav>
+          </div>
+        </header>
 
-        <div className="desktop-canvas" ref={canvasRef}>
-          {visibleWindows.map((app) => {
-            const layout = WINDOW_LAYOUTS[app.id];
+        <section className="nr-about nr-rise" style={delay(2)}>
+          <div className="nr-about-body">
+            {PROFILE.about.map((p) => (
+              <p key={p.slice(0, 16)}>{p}</p>
+            ))}
+          </div>
+        </section>
 
-            return (
-              <WindowFrame
-                key={app.id}
-                appId={app.id}
-                title={app.title}
-                active={activeAppId === app.id}
-                dragging={dragState ? dragState.appId === app.id : false}
-                className={`app-window app-window-${app.id}`}
-                style={{
-                  top: positions[app.id].top,
-                  left: positions[app.id].left,
-                  width: `min(${sizes[app.id].width}px, calc(100% - 24px))`,
-                  height: `min(${sizes[app.id].height}px, calc(100% - 24px))`,
-                  zIndex: windows[app.id].zIndex,
-                }}
-                onFocus={() => focusWindow(app.id)}
-                onDragStart={(event) => startDraggingWindow(app.id, event)}
-                onResizeStart={(event) => startResizingWindow(app.id, event)}
-                onMinimize={() => minimizeWindow(app.id)}
-                onClose={() => closeWindow(app.id)}
-              >
-                {renderWindowContent(app.id)}
-              </WindowFrame>
-            );
-          })}
-        </div>
-      </section>
+        <section className="nr-section" aria-labelledby="work-h">
+          <div className="nr-section-head">
+            <h2 id="work-h">Selected work</h2>
+            <span className="nr-section-note">
+              Five of sixteen — expand any entry
+            </span>
+          </div>
+          <ol className="nr-list">
+            {FEATURED.map((p, i) => (
+              <WorkEntry
+                key={p.id}
+                project={p}
+                index={i}
+                open={openId === p.id}
+                onToggle={() => toggle(p.id)}
+                onRunDemo={() => setDemoOpen(true)}
+                style={delay(3 + i)}
+              />
+            ))}
+          </ol>
+        </section>
 
-      {startOpen ? (
-        <div className="start-menu">
-          {APP_DEFINITIONS.map((app) => (
-            <button key={app.id} onClick={() => openWindow(app.id)}>
-              <span>{app.icon}</span>
-              <div>
-                <strong>{app.label}</strong>
-                <small>{app.command}</small>
-              </div>
-            </button>
-          ))}
-        </div>
-      ) : null}
+        <section className="nr-section" aria-labelledby="exp-h">
+          <div className="nr-section-head">
+            <h2 id="exp-h">Experience</h2>
+            <span className="nr-section-note">Full résumé on request</span>
+          </div>
+          <ol className="nr-list">
+            {EXPERIENCE.map((e) => (
+              <ExperienceRow
+                key={e.id}
+                entry={e}
+                open={openId === e.id}
+                onToggle={() => toggle(e.id)}
+              />
+            ))}
+          </ol>
+        </section>
 
-      <footer className="taskbar">
-        <button
-          className={`start-button${startOpen ? ' active' : ''}`}
-          onClick={() => setStartOpen((value) => !value)}
+        <section
+          className="nr-section nr-skills-section"
+          aria-labelledby="stack-h"
         >
-          Start
-        </button>
-        <div className="taskbar-tabs">
-          {openWindows.map((app) => (
-            <button
-              key={app.id}
-              className={`taskbar-tab${
-                windows[app.id].minimized ? ' minimized' : ''
-              }${activeAppId === app.id ? ' active' : ''}`}
-              onClick={() => {
-                if (windows[app.id].minimized) {
-                  openWindow(app.id);
-                } else {
-                  focusWindow(app.id);
-                }
-              }}
-            >
-              {app.label}
-            </button>
-          ))}
-        </div>
-        <button className="taskbar-clock" onClick={() => setStartOpen(false)}>
-          {clockValue}
-        </button>
-      </footer>
-    </main>
+          <div className="nr-section-head">
+            <h2 id="stack-h">Stack</h2>
+            <span className="nr-section-note">Day-to-day tools</span>
+          </div>
+          <div className="nr-skills">
+            {SKILLS.map((s) => (
+              <code key={s}>{s}</code>
+            ))}
+          </div>
+        </section>
+
+        <footer className="nr-colophon">
+          <div>
+            <h3>Reach</h3>
+            <p className="nr-reach">
+              <a href={`mailto:${PROFILE.links.email}`}>
+                {PROFILE.links.email}
+              </a>
+            </p>
+            <p className="nr-reach-sub">
+              Open to conversations about authorization, Rust, and product
+              engineering.
+            </p>
+          </div>
+          <div className="nr-colophon-links">
+            <h3>Elsewhere</h3>
+            <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
+              github.com/foosiee
+            </a>
+            <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
+              linkedin.com/in/colefoos
+            </a>
+            <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+              résumé (PDF)
+            </a>
+          </div>
+        </footer>
+      </div>
+      <DemoDrawer open={demoOpen} onClose={() => setDemoOpen(false)} />
+    </div>
   );
+}
+
+function WorkEntry(props: {
+  project: FeaturedProject;
+  index: number;
+  open: boolean;
+  onToggle: () => void;
+  onRunDemo: () => void;
+  style?: React.CSSProperties;
+}) {
+  const { project: p, index, open } = props;
+  return (
+    <li className="nr-item nr-rise" style={props.style}>
+      <button
+        className="nr-item-head"
+        aria-expanded={open}
+        onClick={props.onToggle}
+      >
+        <span className="nr-num">{String(index + 1).padStart(2, '0')}</span>
+        <span className="nr-title">{p.title}</span>
+        <span className="nr-blurb">{p.blurb}</span>
+        <span className="nr-tail">
+          <span className="nr-era">{p.era}</span>
+          <span className={'nr-kind nr-kind-' + p.kind}>
+            {p.kind === 'live'
+              ? 'Live'
+              : p.kind === 'external'
+              ? 'External'
+              : 'Case study'}
+          </span>
+          <span className={'nr-chev' + (open ? ' is-open' : '')} aria-hidden>
+            ▾
+          </span>
+        </span>
+      </button>
+
+      {open && p.writeup && (
+        <div className="nr-detail">
+          <div className="nr-detail-main">
+            <p className="nr-detail-problem">{p.writeup.problem}</p>
+            <p>{p.writeup.approach}</p>
+            {p.writeup.note && (
+              <p className="nr-detail-note">{p.writeup.note}</p>
+            )}
+            <div className="nr-detail-actions">
+              {p.kind === 'live' && (
+                <button className="nr-run-demo" onClick={props.onRunDemo}>
+                  <span className="nr-live">●</span> Run the live demo
+                </button>
+              )}
+              {p.href && (
+                <a
+                  className="nr-visit"
+                  href={p.href}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {p.hrefLabel ?? 'Visit ↗'}
+                </a>
+              )}
+            </div>
+          </div>
+          <aside className="nr-detail-side">
+            <h4 className="nr-detail-label">Deliverables</h4>
+            <ul className="nr-deliverables">
+              {p.writeup.deliverables.map((d) => (
+                <li key={d}>{d}</li>
+              ))}
+            </ul>
+            <div className="nr-detail-stack">
+              {p.tags.map((t) => (
+                <code key={t}>{t}</code>
+              ))}
+            </div>
+          </aside>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function ExperienceRow(props: {
+  entry: ExperienceEntry;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const { entry: e, open } = props;
+  return (
+    <li className="nr-item">
+      <button
+        className="nr-item-head nr-item-head-exp"
+        aria-expanded={open}
+        onClick={props.onToggle}
+      >
+        <span className="nr-num nr-num-mono">{e.span}</span>
+        <span className="nr-title nr-title-sm">
+          {e.org} <span className="nr-role">· {e.title}</span>
+        </span>
+        <span className="nr-blurb">{e.summary}</span>
+        <span className="nr-tail">
+          <span className={'nr-chev' + (open ? ' is-open' : '')} aria-hidden>
+            ▾
+          </span>
+        </span>
+      </button>
+      {open && (
+        <div className="nr-detail">
+          <div className="nr-detail-main">
+            <p>{e.commentary}</p>
+          </div>
+          <aside className="nr-detail-side">
+            <h4 className="nr-detail-label">Highlights</h4>
+            <ul className="nr-deliverables">
+              {e.highlights.map((h) => (
+                <li key={h}>{h}</li>
+              ))}
+            </ul>
+            <div className="nr-detail-stack">
+              {e.tags.map((t) => (
+                <code key={t}>{t}</code>
+              ))}
+            </div>
+          </aside>
+        </div>
+      )}
+    </li>
+  );
+}
+
+/** Slide-in drawer hosting the real Cedar Language Server demo. */
+function DemoDrawer(props: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (!props.open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') props.onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [props.open, props.onClose]);
+
+  if (!props.open) return null;
+
+  return (
+    <div
+      className="nr-drawer-root"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Cedar Language Server demo"
+    >
+      <div className="nr-drawer-backdrop" onClick={props.onClose} />
+      <aside className="nr-drawer nr-drawer-wide">
+        <header className="nr-drawer-head">
+          <p className="nr-eyebrow">
+            <span className="nr-live">●</span> LIVE — Cedar Language Server
+            <span className="nr-caret" aria-hidden />
+          </p>
+          <button
+            className="nr-drawer-close"
+            onClick={props.onClose}
+            aria-label="Close demo"
+          >
+            ✕
+          </button>
+        </header>
+        <div className="nr-drawer-body">
+          <CedarDemo />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+/** Staggered entrance delay; CSS handles the reduced-motion fallback. */
+function delay(step: number): React.CSSProperties {
+  return { ['--rise-delay' as string]: `${step * 70}ms` };
 }
