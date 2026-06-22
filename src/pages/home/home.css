@@ -302,6 +302,25 @@
   color: var(--soft);
 }
 
+/* project sub-indices — two labeled groups (At work / On my own) sharing the
+   numbered-index pattern. The label is a quiet mono readout in muted cobalt;
+   the second group gets extra air so the two indices read as distinct. */
+.nr-group + .nr-group {
+  margin-top: clamp(40px, 6vw, 72px);
+}
+.nr-group-label {
+  /* 4px left padding aligns the label with the index number column
+     (.nr-item-head has 4px inline padding) so it reads as part of the grid */
+  margin: 14px 0 2px;
+  padding-left: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--violet);
+}
+
 /* numbered index */
 .nr-list {
   list-style: none;

@@ -14,7 +14,6 @@ export const PROFILE = {
     'I build the large-scale distributed systems behind identity and authorization at AWS.',
   about: [
     'Five-plus years building large-scale, high-throughput distributed systems. These days that means production Rust authorization services — single-digit-millisecond latency, deep platform integrations — and leading cross-team design while staying hands-on across the stack.',
-    'I’d rather show you something than tell you, so one of the projects below actually runs in your browser. Mostly, though, the work is the systems underneath.',
   ],
   links: {
     github: config.github,
@@ -47,7 +46,7 @@ export interface FeaturedProject {
   writeup: ProjectWriteup;
 }
 
-export const FEATURED: FeaturedProject[] = [
+export const WORK: FeaturedProject[] = [
   {
     id: 'cedar-lsp',
     title: 'Cedar Language Server',
@@ -55,7 +54,7 @@ export const FEATURED: FeaturedProject[] = [
     blurb:
       'Authored the Cedar language server and packaged it to WASM. Powers the AWS AVP console — and runs live, right here.',
     tags: ['Rust', 'WASM', 'Monaco', 'Cedar'],
-    era: '2024',
+    era: '2025',
     href:
       'https://github.com/cedar-policy/cedar/tree/fdd3e50cd7efb915bf8f6c351e731ae4a1aca6a5/cedar-language-server',
     hrefLabel: 'view source ↗',
@@ -78,7 +77,7 @@ export const FEATURED: FeaturedProject[] = [
     blurb:
       'Turned Cedar partial-evaluation residuals into indexed lookups so apps can ask "what can Alice see?", not just "can Alice see X?".',
     tags: ['Cedar', 'DynamoDB', 'Valkey', 'Lambda'],
-    era: '2024',
+    era: '2025–2026',
     writeup: {
       problem:
         'Point authorization answers "can Alice view document X?". Several internal apps needed the inverse — "what documents can Alice view?" — across an entire dataset, which a per-entity check can’t answer at scale.',
@@ -92,70 +91,65 @@ export const FEATURED: FeaturedProject[] = [
     },
   },
   {
-    id: 'ava-endpoint-authorization',
-    title: 'Endpoint Authorization Platform',
+    id: 'everest-ml-branching',
+    title: 'ML-Driven Marketing Campaigns',
     kind: 'case',
     blurb:
-      'Client-side authorization and session transport for AWS Verified Access — extending zero-trust access to non-HTTP(S) protocols like SSH and RDP, which never carried user identity. Shipped Dec 2024.',
-    tags: ['Rust', 'OAuth', 'Zero Trust', 'DNS'],
-    era: '2024',
-    href:
-      'https://aws.amazon.com/blogs/aws/aws-verified-access-now-supports-secure-access-to-resources-over-non-https-protocols/',
-    hrefLabel: 'read the launch ↗',
+      'An ML-backed Everest workflow node that automatically chose the best-performing branch inside a live marketing campaign — applied-science inference wired into a marketer-facing orchestration graph.',
+    tags: ['ML Integration', 'Java', 'Angular', 'Workflow Systems'],
+    era: '2023',
     writeup: {
       problem:
-        'Verified Access secured HTTP(S) apps, but protocols like SSH, RDP, JDBC, and ODBC carry no user identity and sat outside policy control. The challenge was extending Cedar-controlled, zero-trust access to them — with decisions made centrally in AWS, not on the client.',
+        'A model is only useful if it can participate cleanly in a production workflow. The challenge was connecting applied-science output to a marketer-facing orchestration product instead of leaving it a science-side experiment.',
       approach:
-        'I owned the client-side decision services and contributed the OAuth/session layer that let identity travel with each connection — authenticating through the identity provider and tunneling to a resource by its assigned DNS name, while authorization stayed central.',
+        'I partnered with an applied scientist who owned the model while I owned the production path into Everest — fitting model inference and its results cleanly into the existing graph-based campaign product, so marketers got an adaptive branching node instead of hand-tuning every branch.',
       deliverables: [
-        'Client-side authorization decision services (the connectivity-client path)',
-        'OAuth / session transport carrying identity over the wire',
-        'Cross-team design across Route53, Identity, and client engineering',
-        'A slice launched as AWS Verified Access support for non-HTTP(S) protocols (public preview, Dec 2024)',
+        'Production integration between Everest and an applied-science model',
+        'Adaptive ML branching node in the marketer-facing workflow graph',
+        'Model inference and result feedback wired into live campaign execution',
       ],
-      note:
-        'This was the heart of my SDE II role at AWS. It was an ambitious program, and not all of it shipped — the broadest vision, authorization over DNS, was cut, and some of my work with it. But a real slice did launch as Verified Access’s non-HTTP(S) support, and it was some of the best systems work I’ve done.',
     },
   },
   {
-    id: 'everest-platform',
-    title: 'Everest Campaign Orchestration',
+    id: 'lifecycle-promotions',
+    title: 'Lifecycle Promotions',
     kind: 'case',
     blurb:
-      'Core contributor to an internal Amazon platform modeling marketing campaigns as workflow graphs — send, wait, branch — at Amazon scale.',
-    tags: ['Java', 'Angular', 'Workflow Systems'],
+      'An event-driven Everest feature that let a promotion require several customer actions before a journey advanced — which meant reshaping the campaign model from a tree into a DAG.',
+    tags: ['Java', 'Angular', 'Event Processing', 'Graph Modeling'],
     era: '2022',
     writeup: {
       problem:
-        'Automated marketing campaigns aren’t one-step sends. Teams needed a reusable system that could branch, wait, react to state, and coordinate across channels — without each team rebuilding the same orchestration.',
+        'Promotions could previously depend on only one event. Supporting many prerequisite events changed both the data model and the shape of the workflow: Everest’s frontend model was a tree, but this needed a DAG.',
       approach:
-        'Modeled campaigns as graphs of actions (send / wait / branch / follow-up) rather than linear flows, providing the base platform that several later features — ML branching, lifecycle promotions, nudging — were built on.',
+        'I owned the frontend integration that translated Everest’s graph model into sane API inputs, plus the state tracking that let customers see which prerequisite events were complete — while a separate team handled promotion-credit issuance.',
       deliverables: [
-        'Workflow-graph campaign model',
-        'Multi-channel execution at Amazon scale',
-        'Foundation for downstream feature teams',
+        'Multi-event promotion journeys, up from single-event rules',
+        'Tree-to-DAG workflow-model integration on the Everest frontend',
+        'Event-state visibility so marketers could see where customers stalled',
       ],
     },
   },
   {
-    id: 'spotify-lyrics',
-    title: 'spotify-lyrics',
-    kind: 'external',
+    id: 'document-processor',
+    title: 'Automated Document Processor',
+    kind: 'case',
     blurb:
-      'A web player that pulls live lyrics for whatever is playing in Spotify. A small, focused consumer product with a tight feedback loop.',
-    tags: ['Web', 'Spotify API', 'Frontend'],
-    href: 'https://www.spotify-lyrics.com/',
-    era: '2021',
+      'An event-driven, serverless invoice-processing pipeline that pulled people out of repetitive billing work — one of my first real tastes of shipping measurable business impact.',
+    tags: ['AWS', 'Serverless', 'OCR', 'Event-Driven'],
+    era: '2019',
     writeup: {
       problem:
-        'Spotify playback and lyrics are separate pieces of information. The product challenge was connecting them with as little friction as possible.',
+        'People were spending real time manually extracting and routing invoice information that OCR-backed automation could handle instead.',
       approach:
-        'Built a lightweight consumer interface around playback context — a narrow tool with immediate feedback and a clear UX loop, shipped as a public web app.',
+        'I built an event-driven, serverless pipeline on AWS Textract and Rekognition to read, extract, and route invoice data, moving humans out of the repetitive billing steps and into exception handling.',
       deliverables: [
-        'Spotify playback integration',
-        'Live lyric sync to the current track',
-        'Shipped, public web product',
+        'OCR extraction pipeline on Textract and Rekognition',
+        'Event-driven, serverless billing workflow',
+        'Measurable reduction in manual billing effort',
       ],
+      note:
+        'One of my first real experiences building something with direct business impact, early in my time at OnPoint.',
     },
   },
 ];
@@ -197,7 +191,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     span: '2023—2025',
     summary: 'Zero-trust endpoint authorization · AWS Verified Access.',
     commentary:
-      'The role behind the Endpoint Authorization Platform in selected work. I built the authorization core — a Rust service in the request path — for extending AWS Verified Access’s zero-trust model to new kinds of endpoints, where latency and clean cross-team integration were everything. Not all of the program shipped, but the part that did was some of the best systems work I’ve done.',
+      'I built the authorization core — a Rust service in the request path — for extending AWS Verified Access’s zero-trust model to new kinds of endpoints, where latency and clean cross-team integration were everything. Not all of the program shipped, but a real slice launched as Verified Access’s support for non-HTTP(S) protocols, and it was some of the best systems work I’ve done.',
     highlights: [
       'Designed and built a Rust-based managed authn/authz service for the zero-trust access program behind Verified Access',
       'Engineered caching that achieved single-digit-millisecond response times at scale',

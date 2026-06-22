@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './home.css';
-import { EXPERIENCE, FEATURED, PROFILE, SKILLS } from './content';
+import { EXPERIENCE, WORK, PROFILE, SKILLS } from './content';
 import type { ExperienceEntry, FeaturedProject } from './content';
 import CedarDemo from '../../components/cedarDemo/cedarDemo';
 
@@ -24,7 +24,7 @@ function initialTheme(): Theme {
  */
 export default function Home() {
   // First (live) project open by default, so a skimmer sees something runs.
-  const [openId, setOpenId] = useState<string | null>(FEATURED[0].id);
+  const [openId, setOpenId] = useState<string | null>(WORK[0].id);
   const [demoOpen, setDemoOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const toggle = (id: string) => setOpenId((cur) => (cur === id ? null : id));
@@ -86,28 +86,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="nr-section" aria-labelledby="work-h">
-          <div className="nr-section-head">
-            <h2 id="work-h">Selected work</h2>
-            <span className="nr-section-note">
-              Five of sixteen — expand any entry
-            </span>
-          </div>
-          <ol className="nr-list">
-            {FEATURED.map((p, i) => (
-              <WorkEntry
-                key={p.id}
-                project={p}
-                index={i}
-                open={openId === p.id}
-                onToggle={() => toggle(p.id)}
-                onRunDemo={() => setDemoOpen(true)}
-                style={delay(3 + i)}
-              />
-            ))}
-          </ol>
-        </section>
-
         <section className="nr-section" aria-labelledby="exp-h">
           <div className="nr-section-head">
             <h2 id="exp-h">Experience</h2>
@@ -137,6 +115,32 @@ export default function Home() {
             {SKILLS.map((s) => (
               <code key={s}>{s}</code>
             ))}
+          </div>
+        </section>
+
+        <section className="nr-section" aria-labelledby="work-h">
+          <div className="nr-section-head">
+            <h2 id="work-h">Projects</h2>
+            <span className="nr-section-note">Expand any entry</span>
+          </div>
+
+          <div className="nr-group">
+            <h3 id="work-at-work" className="nr-group-label">
+              At work
+            </h3>
+            <ol className="nr-list" aria-labelledby="work-at-work">
+              {WORK.map((p, i) => (
+                <WorkEntry
+                  key={p.id}
+                  project={p}
+                  index={i}
+                  open={openId === p.id}
+                  onToggle={() => toggle(p.id)}
+                  onRunDemo={() => setDemoOpen(true)}
+                  style={delay(3 + i)}
+                />
+              ))}
+            </ol>
           </div>
         </section>
 
@@ -195,10 +199,10 @@ function WorkEntry(props: {
           <span className="nr-era">{p.era}</span>
           <span className={'nr-kind nr-kind-' + p.kind}>
             {p.kind === 'live'
-              ? 'Live'
+              ? 'Interactive'
               : p.kind === 'external'
               ? 'External'
-              : 'Case study'}
+              : 'Write-up'}
           </span>
           <span className={'nr-chev' + (open ? ' is-open' : '')} aria-hidden>
             ▾
