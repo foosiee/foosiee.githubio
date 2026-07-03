@@ -52,7 +52,7 @@ export const WORK: FeaturedProject[] = [
     title: 'Cedar Language Server',
     kind: 'live',
     blurb:
-      'Authored the Cedar language server and packaged it to WASM. Powers the AWS AVP console — and runs live, right here.',
+      'Authored the Cedar language server and packaged it to WASM. It powers the AWS AVP console, and it runs live on this page.',
     tags: ['Rust', 'WASM', 'Monaco', 'Cedar'],
     era: '2025',
     href:
@@ -60,9 +60,9 @@ export const WORK: FeaturedProject[] = [
     hrefLabel: 'view source ↗',
     writeup: {
       problem:
-        'Language tooling is hard to show through a repo link. I wanted the editor experience and the Cedar runtime to be something people could actually try, not just read about.',
+        'Language tooling is hard to show off through a repo link. I wanted people to actually try the editor and the Cedar runtime in a browser, instead of just reading about them.',
       approach:
-        'Built the language server itself — completions, hover, diagnostics, validation — then compiled it to WASM and wired it to Monaco so the whole thing runs in a browser tab. The authorization engine evaluates live; the editor is the same one in the console.',
+        'I built the language server itself: completions, hover, diagnostics, and validation. Then I compiled it to WASM and wired it to Monaco, so the whole thing runs in a browser tab. The authorization engine evaluates for real, and the editor is the same one that ships in the console.',
       deliverables: [
         'Cedar language server: completions, hover, diagnostics, validation',
         'WASM + Monaco browser integration',
@@ -80,9 +80,9 @@ export const WORK: FeaturedProject[] = [
     era: '2025–2026',
     writeup: {
       problem:
-        'Point authorization answers "can Alice view document X?". Several internal apps needed the inverse — "what documents can Alice view?" — across an entire dataset, which a per-entity check can’t answer at scale.',
+        'Point authorization answers "can Alice view document X?". Several internal apps needed the inverse, "what documents can Alice view?", across a whole dataset, which a per-entity check can’t answer at scale.',
       approach:
-        'Treated the resource as unknown and partially evaluated the relevant Cedar policies into residuals, then extracted constraints (public visibility, ownership) into indexed queries instead of scanning every entity and re-running full authorization.',
+        'I treated the resource as unknown and partially evaluated the Cedar policies into residuals, then turned the constraints they left behind (public visibility, ownership) into indexed queries, instead of scanning every entity and re-running full authorization.',
       deliverables: [
         'Storage + query path over Cedar residuals',
         'Principal/resource ingestion APIs for service teams',
@@ -91,18 +91,38 @@ export const WORK: FeaturedProject[] = [
     },
   },
   {
+    id: 'avp-identity-center',
+    title: 'AVP Identity Center Integration',
+    kind: 'case',
+    blurb:
+      'External authorization for AWS first-party apps that don’t have IAM for their own resources. AVP loads the caller’s Identity Center groups and attributes itself, so the app doesn’t have to fetch them first.',
+    tags: ['Rust', 'Cedar', 'Identity Center', 'AWS'],
+    era: '2025',
+    writeup: {
+      problem:
+        'Plenty of AWS first-party apps have off-console experiences and no way to use IAM for authorizing their own resources. They still need authorization, and that decision depends on the caller’s group memberships and attributes.',
+      approach:
+        'I drove the integration between AVP and AWS IAM Identity Center so these apps could hand their authorization to AVP. When a request comes in, AVP reads the caller’s groups and attributes straight from Identity Center and uses them in the decision, so the app never has to look them up or pass them along.',
+      deliverables: [
+        'AVP integration with AWS IAM Identity Center',
+        'Automatic hydration of the caller’s groups and attributes at decision time',
+        'Externalized authorization for first-party apps without IAM',
+      ],
+    },
+  },
+  {
     id: 'everest-ml-branching',
     title: 'ML-Driven Marketing Campaigns',
     kind: 'case',
     blurb:
-      'An ML-backed Everest workflow node that automatically chose the best-performing branch inside a live marketing campaign — applied-science inference wired into a marketer-facing orchestration graph.',
+      'An ML-backed Everest workflow node that picked the best-performing branch inside a live marketing campaign. It wired applied-science inference into the graph marketers actually build in.',
     tags: ['ML Integration', 'Java', 'Angular', 'Workflow Systems'],
     era: '2023',
     writeup: {
       problem:
-        'A model is only useful if it can participate cleanly in a production workflow. The challenge was connecting applied-science output to a marketer-facing orchestration product instead of leaving it a science-side experiment.',
+        'A model only matters if it can run inside a real production workflow. The hard part was connecting the applied scientist’s output to a marketer-facing product, instead of leaving it a science-side experiment.',
       approach:
-        'I partnered with an applied scientist who owned the model while I owned the production path into Everest — fitting model inference and its results cleanly into the existing graph-based campaign product, so marketers got an adaptive branching node instead of hand-tuning every branch.',
+        'I partnered with an applied scientist who owned the model, while I owned the production path into Everest. I fit the model’s inference and results into the existing graph-based campaign product, so marketers got an adaptive branching node instead of hand-tuning every branch.',
       deliverables: [
         'Production integration between Everest and an applied-science model',
         'Adaptive ML branching node in the marketer-facing workflow graph',
@@ -115,14 +135,14 @@ export const WORK: FeaturedProject[] = [
     title: 'Lifecycle Promotions',
     kind: 'case',
     blurb:
-      'An event-driven Everest feature that let a promotion require several customer actions before a journey advanced — which meant reshaping the campaign model from a tree into a DAG.',
+      'An event-driven Everest feature that let a promotion require several customer actions before a journey advanced. Supporting that meant reshaping the campaign model from a tree into a DAG.',
     tags: ['Java', 'Angular', 'Event Processing', 'Graph Modeling'],
     era: '2022',
     writeup: {
       problem:
         'Promotions could previously depend on only one event. Supporting many prerequisite events changed both the data model and the shape of the workflow: Everest’s frontend model was a tree, but this needed a DAG.',
       approach:
-        'I owned the frontend integration that translated Everest’s graph model into sane API inputs, plus the state tracking that let customers see which prerequisite events were complete — while a separate team handled promotion-credit issuance.',
+        'I owned the frontend integration that translated Everest’s graph model into sane API inputs, plus the state tracking that showed which prerequisite events were complete. A separate team handled promotion-credit issuance.',
       deliverables: [
         'Multi-event promotion journeys, up from single-event rules',
         'Tree-to-DAG workflow-model integration on the Everest frontend',
@@ -135,21 +155,21 @@ export const WORK: FeaturedProject[] = [
     title: 'Automated Document Processor',
     kind: 'case',
     blurb:
-      'An event-driven, serverless invoice-processing pipeline that pulled people out of repetitive billing work — one of my first real tastes of shipping measurable business impact.',
+      'An event-driven, serverless invoice-processing pipeline that took people out of repetitive billing work.',
     tags: ['AWS', 'Serverless', 'OCR', 'Event-Driven'],
     era: '2019',
     writeup: {
       problem:
-        'People were spending real time manually extracting and routing invoice information that OCR-backed automation could handle instead.',
+        'People were spending hours manually extracting and routing invoice data that OCR-backed automation could handle instead.',
       approach:
-        'I built an event-driven, serverless pipeline on AWS Textract and Rekognition to read, extract, and route invoice data, moving humans out of the repetitive billing steps and into exception handling.',
+        'I built an event-driven, serverless pipeline on AWS Textract and Rekognition to read, extract, and route invoice data, moving people out of the repetitive billing steps and into exception handling.',
       deliverables: [
         'OCR extraction pipeline on Textract and Rekognition',
         'Event-driven, serverless billing workflow',
         'Measurable reduction in manual billing effort',
       ],
       note:
-        'One of my first real experiences building something with direct business impact, early in my time at OnPoint.',
+        'One of my first experiences building something with direct business impact, early in my time at OnPoint.',
     },
   },
 ];
@@ -173,14 +193,14 @@ export const EXPERIENCE: ExperienceEntry[] = [
     org: 'Amazon Web Services',
     title: 'SDE III',
     span: '2025—now',
-    summary: 'Amazon Verified Permissions — managed authorization.',
+    summary: 'Amazon Verified Permissions · managed authorization.',
     commentary:
-      'I’m on Amazon Verified Permissions, AWS’s managed authorization service. My work spans the Cedar policy language and the service itself — compliance and connectivity, identity integrations, and the query APIs that answer “who can access what?”',
+      'I’m on Amazon Verified Permissions, AWS’s managed authorization service. My work spans the Cedar policy language and the service itself: compliance and connectivity, identity integrations, and the query APIs that answer “who can access what?”',
     highlights: [
-      'Delivered FIPS, PrivateLink, and IPv6 support — broadening compliance reach and secure connectivity for regulated customers',
+      'Delivered FIPS, PrivateLink, and IPv6 support, widening compliance and secure connectivity for regulated customers',
       'Built integrations between AVP and AWS IAM Identity Center for a unified path to externalized authorization',
       'Leading design of internal authorization-query APIs (slated for external launch): “who has access to what?”, “what can a user reach?”',
-      'Authored a Cedar language server — an open-source contribution improving the policy-authoring experience',
+      'Authored a Cedar language server, an open-source contribution that improved the policy-authoring experience',
     ],
     tags: ['Rust', 'Cedar', 'AWS', 'Authorization'],
   },
@@ -191,7 +211,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     span: '2023—2025',
     summary: 'Zero-trust endpoint authorization · AWS Verified Access.',
     commentary:
-      'I built the authorization core — a Rust service in the request path — for extending AWS Verified Access’s zero-trust model to new kinds of endpoints, where latency and clean cross-team integration were everything. Not all of the program shipped, but a real slice launched as Verified Access’s support for non-HTTP(S) protocols, and it was some of the best systems work I’ve done.',
+      'I built the authorization core, a Rust service in the request path, for extending AWS Verified Access’s zero-trust model to new kinds of endpoints, where latency and clean cross-team integration mattered most. Not all of the program shipped, but a real slice launched as Verified Access’s support for non-HTTP(S) protocols, and it was some of the best systems work I’ve done.',
     highlights: [
       'Designed and built a Rust-based managed authn/authz service for the zero-trust access program behind Verified Access',
       'Engineered caching that achieved single-digit-millisecond response times at scale',
@@ -205,7 +225,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     org: 'Amazon',
     title: 'SDE II',
     span: '2022—2023',
-    summary: 'Everest — lifecycle marketing platform.',
+    summary: 'Everest · lifecycle marketing platform.',
     commentary:
       'I built features for Everest, the drag-and-drop platform marketers used to compose lifecycle journeys for millions of people a day, gravitating to the parts that made it smarter and safer.',
     highlights: [
@@ -221,7 +241,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     org: 'Amazon',
     title: 'SDE I',
     span: '2021—2022',
-    summary: 'Everest — lifecycle marketing platform · remote.',
+    summary: 'Everest · lifecycle marketing platform · remote.',
     commentary:
       'My first full-time role, on Everest (the lifecycle marketing platform), focused on the event and notification plumbing that drove engagement at scale.',
     highlights: [
@@ -237,7 +257,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     span: '2019—2021',
     summary: 'Automation, cloud, and integrations.',
     commentary:
-      'Where I started — a small team where I owned things end to end across automation, cloud, and integrations.',
+      'This is where I started: a small team where I owned things end to end across automation, cloud, and integrations.',
     highlights: [
       'Built an invoice-automation system (Textract, Rekognition, Salesforce) processing hundreds of invoices/day; tuned Azure Cosmos DB for a 10× page-load reduction',
       'Delivered mobile-app backend services, a CI/CD pipeline in GitHub Actions, Power BI dashboards, and CRM integrations',
