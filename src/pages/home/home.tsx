@@ -3,6 +3,10 @@ import './home.css';
 import { EXPERIENCE, WORK, PROFILE, SKILLS } from './content';
 import type { ExperienceEntry, FeaturedProject } from './content';
 import CedarDemo from '../../components/cedarDemo/cedarDemo';
+import {
+  MlBranchFigure,
+  PromoDagFigure,
+} from '../../components/journeyGraph/journeyGraph';
 
 type Theme = 'light' | 'dark';
 
@@ -176,6 +180,16 @@ export default function Home() {
   );
 }
 
+/** Sequential figure numbers ("01", "02", …) for diagram-bearing projects,
+ * in index order — independent of entry ordinals, so "Fig. 01" is always
+ * the first figure on the page. */
+const FIGURE_NUMBERS = new Map(
+  WORK.filter((p) => p.diagram).map((p, i) => [
+    p.id,
+    String(i + 1).padStart(2, '0'),
+  ])
+);
+
 function WorkEntry(props: {
   project: FeaturedProject;
   index: number;
@@ -185,6 +199,7 @@ function WorkEntry(props: {
   style?: React.CSSProperties;
 }) {
   const { project: p, index, open } = props;
+  const ordinal = String(index + 1).padStart(2, '0');
   return (
     <li className="nr-item nr-rise" style={props.style}>
       <button
@@ -192,7 +207,7 @@ function WorkEntry(props: {
         aria-expanded={open}
         onClick={props.onToggle}
       >
-        <span className="nr-num">{String(index + 1).padStart(2, '0')}</span>
+        <span className="nr-num">{ordinal}</span>
         <span className="nr-title">{p.title}</span>
         <span className="nr-blurb">{p.blurb}</span>
         <span className="nr-tail">
@@ -249,6 +264,12 @@ function WorkEntry(props: {
               ))}
             </div>
           </aside>
+          {p.diagram === 'ml-branch' && (
+            <MlBranchFigure ordinal={FIGURE_NUMBERS.get(p.id)!} />
+          )}
+          {p.diagram === 'promo-dag' && (
+            <PromoDagFigure ordinal={FIGURE_NUMBERS.get(p.id)!} />
+          )}
         </div>
       )}
     </li>

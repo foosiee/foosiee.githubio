@@ -33,6 +33,9 @@ export interface ProjectWriteup {
   note?: string;
 }
 
+/** Inline SVG exhibit rendered inside the expanded detail (journeyGraph.tsx). */
+export type ProjectDiagram = 'ml-branch' | 'promo-dag';
+
 export interface FeaturedProject {
   id: string;
   title: string;
@@ -44,6 +47,7 @@ export interface FeaturedProject {
   hrefLabel?: string;
   era: string;
   writeup: ProjectWriteup;
+  diagram?: ProjectDiagram;
 }
 
 export const WORK: FeaturedProject[] = [
@@ -115,18 +119,19 @@ export const WORK: FeaturedProject[] = [
     title: 'ML-Driven Marketing Campaigns',
     kind: 'case',
     blurb:
-      'An ML-backed Everest workflow node that picked the best-performing branch inside a live marketing campaign. It wired applied-science inference into the graph marketers actually build in.',
+      'An ML-backed Everest node that ran the A/B loop marketers did by hand — attribute conversions to branches, then shift traffic toward the winner, live inside the campaign graph.',
     tags: ['ML Integration', 'Java', 'Angular', 'Workflow Systems'],
     era: '2023',
+    diagram: 'ml-branch',
     writeup: {
       problem:
-        'A model only matters if it can run inside a real production workflow. The hard part was connecting the applied scientist’s output to a marketer-facing product, instead of leaving it a science-side experiment.',
+        'Marketers already A/B tested campaign branches: start the split at random, watch which email-and-offer combination converted, then re-weight the branches by hand. The attribution and the tuning were manual, and they always lagged the data.',
       approach:
-        'I partnered with an applied scientist who owned the model, while I owned the production path into Everest. I fit the model’s inference and results into the existing graph-based campaign product, so marketers got an adaptive branching node instead of hand-tuning every branch.',
+        'I partnered with an applied scientist who owned the model, while I owned the production path into Everest. I fit the model’s inference and results into the existing graph-based campaign product as a branching node that closes the loop itself — attributing conversions to branches and shifting traffic toward the best performer, continuously.',
       deliverables: [
         'Production integration between Everest and an applied-science model',
-        'Adaptive ML branching node in the marketer-facing workflow graph',
-        'Model inference and result feedback wired into live campaign execution',
+        'ML branching node that automates the attribute-and-re-weight loop',
+        'Conversion attribution fed back into live campaign execution',
       ],
     },
   },
@@ -138,6 +143,7 @@ export const WORK: FeaturedProject[] = [
       'An event-driven Everest feature that let a promotion require several customer actions before a journey advanced. Supporting that meant reshaping the campaign model from a tree into a DAG.',
     tags: ['Java', 'Angular', 'Event Processing', 'Graph Modeling'],
     era: '2022',
+    diagram: 'promo-dag',
     writeup: {
       problem:
         'Promotions could previously depend on only one event. Supporting many prerequisite events changed both the data model and the shape of the workflow: Everest’s frontend model was a tree, but this needed a DAG.',
