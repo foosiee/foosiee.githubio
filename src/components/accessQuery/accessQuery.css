@@ -1,0 +1,84 @@
+/* The access-query plate — code panels in the instrument voice. Shared
+   plate/edge/token vocabulary comes from components/exhibits; these are the
+   panel internals: Cedar and SQL set small in the mono, the unknown in the
+   structural violet, Allow/Deny in the semantic pair only. */
+
+/* denser than the journey plates — scroll rather than shrink the code */
+.aq-figure {
+  --plate-min: 820px;
+}
+
+.aq-panel rect {
+  fill: var(--raise);
+  stroke: var(--line);
+}
+
+.aq-code {
+  font: 400 10.5px 'JetBrains Mono', ui-monospace, monospace;
+  fill: var(--ink);
+}
+.aq-kw {
+  font-weight: 700;
+}
+/* the unknown — the pivot of the whole exhibit — in the structural violet */
+.aq-unk {
+  fill: var(--violet);
+  font-weight: 500;
+}
+.aq-unk-line {
+  stroke: var(--violet);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.aq-com {
+  font: 400 9.5px 'JetBrains Mono', ui-monospace, monospace;
+  fill: var(--comment);
+}
+.aq-tag {
+  font: 500 9px 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  fill: var(--violet);
+}
+
+/* the mfa forbid: already decided, struck from the working set */
+.aq-dim {
+  opacity: 0.5;
+}
+.aq-strike {
+  stroke: var(--soft);
+  stroke-width: 1;
+}
+.aq-note-ok {
+  font: 500 9.5px 'JetBrains Mono', ui-monospace, monospace;
+  fill: var(--ok);
+}
+
+/* readouts — counts and decisions are data, so they stay in the mono */
+.aq-big {
+  font: 700 24px 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: -0.02em;
+  fill: var(--ink);
+}
+.aq-big-unit {
+  font: 500 11px 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0;
+  fill: var(--soft);
+}
+.aq-big-sm {
+  font: 700 15px 'JetBrains Mono', ui-monospace, monospace;
+}
+.aq-allow {
+  fill: var(--ok);
+}
+.aq-deny {
+  fill: var(--no);
+}
+.aq-dot {
+  font-weight: 400;
+  fill: var(--soft);
+}
+.aq-sub {
+  font: 500 10.5px 'JetBrains Mono', ui-monospace, monospace;
+  fill: var(--soft);
+}

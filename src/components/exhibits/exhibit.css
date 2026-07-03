@@ -1,0 +1,109 @@
+/* Shared exhibit plumbing — the framed plate on the sunken dot-grid well,
+   its mono caption, and the edge / arrowhead / token vocabulary. Every color
+   routes through the .v-noir tokens so both themes read. Cobalt appears only
+   as the moving token (the One Signal Rule). */
+
+.ex-figure {
+  grid-column: 1 / -1;
+  /* grid items default to min-width:auto — without this the svg's min-width
+     would stretch the page instead of scrolling inside the plate */
+  min-width: 0;
+  margin: 10px 0 0;
+}
+.ex-plate {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background-color: var(--sunken);
+  /* the instrument bench: a faint dot grid, same hairline color as the frame */
+  background-image: radial-gradient(var(--line) 1px, transparent 1.6px);
+  background-size: 24px 24px;
+  padding: 18px 18px 12px;
+}
+.ex-plate svg {
+  display: block;
+  width: 100%;
+  /* below this the labels stop being legible — scroll instead of shrink */
+  min-width: var(--plate-min, 700px);
+  height: auto;
+}
+.ex-caption {
+  margin: 12px 0 0;
+  max-width: 74ch;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: var(--t-meta);
+  line-height: 1.55;
+  color: var(--soft);
+  text-wrap: pretty;
+}
+.ex-fig {
+  margin-right: 10px;
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--violet);
+}
+
+/* the micro-label voice — panel/node kind headers */
+.ex-kind {
+  font: 500 9px 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--violet);
+}
+
+/* edges */
+.ex-edge {
+  fill: none;
+  stroke: var(--comment);
+  stroke-width: 1.5;
+}
+.ex-edge-done {
+  stroke: var(--ok);
+}
+.ex-edge-pending {
+  stroke-dasharray: 4 4;
+  animation: ex-ants 1.4s linear infinite;
+}
+@keyframes ex-ants {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.ex-arr {
+  fill: var(--comment);
+}
+.ex-arr-ok {
+  fill: var(--ok);
+}
+.ex-edge-label {
+  font: 500 9.5px 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  fill: var(--soft);
+}
+.ex-note {
+  font: 500 10.5px 'JetBrains Mono', ui-monospace, monospace;
+  fill: var(--comment);
+  text-anchor: middle;
+}
+
+/* the live token — the one cobalt element in any exhibit */
+.ex-token-core {
+  fill: var(--acc);
+}
+.ex-token-halo {
+  fill: var(--acc);
+  opacity: 0.18;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* SMIL isn't covered by the global animation:none — remove the token */
+  .ex-token {
+    display: none;
+  }
+  .ex-edge-pending {
+    animation: none;
+  }
+}

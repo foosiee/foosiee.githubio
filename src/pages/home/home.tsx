@@ -7,6 +7,7 @@ import {
   MlBranchFigure,
   PromoDagFigure,
 } from '../../components/journeyGraph/journeyGraph';
+import { AccessQueryFigure } from '../../components/accessQuery/accessQueryFigure';
 
 type Theme = 'light' | 'dark';
 
@@ -264,6 +265,9 @@ function WorkEntry(props: {
               ))}
             </div>
           </aside>
+          {p.diagram === 'access-query' && (
+            <AccessQueryFigure ordinal={FIGURE_NUMBERS.get(p.id)!} />
+          )}
           {p.diagram === 'ml-branch' && (
             <MlBranchFigure ordinal={FIGURE_NUMBERS.get(p.id)!} />
           )}

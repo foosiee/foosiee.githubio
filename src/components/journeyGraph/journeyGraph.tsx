@@ -1,5 +1,6 @@
 import React from 'react';
 import './journeyGraph.css';
+import { ArrowMarker, Edge, ExhibitFigure } from '../exhibits/exhibit';
 
 /**
  * Journey-graph exhibits for the two Everest entries — hand-drawn SVG plates
@@ -25,7 +26,7 @@ function Node(props: {
   return (
     <g className={'jg-node' + (props.pending ? ' jg-node-pending' : '')}>
       <rect x={x} y={y} width={w} height={NODE_H} rx={7} />
-      <text className="jg-kind" x={x + 14} y={y + 19}>
+      <text className="ex-kind" x={x + 14} y={y + 19}>
         {props.kind}
       </text>
       <text className="jg-title" x={x + 14} y={y + 42}>
@@ -44,69 +45,6 @@ function Node(props: {
   );
 }
 
-function Edge(props: { d: string; tone?: 'done' | 'pending'; marker: string }) {
-  const tone = props.tone ? ' jg-edge-' + props.tone : '';
-  return (
-    <path
-      className={'jg-edge' + tone}
-      d={props.d}
-      markerEnd={`url(#${props.marker})`}
-    />
-  );
-}
-
-function Arrow(props: { id: string; ok?: boolean }) {
-  return (
-    <marker
-      id={props.id}
-      viewBox="0 0 8 8"
-      markerWidth="8"
-      markerHeight="8"
-      markerUnits="userSpaceOnUse"
-      refX="7.5"
-      refY="4"
-      orient="auto"
-    >
-      <path
-        className={props.ok ? 'jg-arr-ok' : 'jg-arr'}
-        d="M0 0 L8 4 L0 8 Z"
-      />
-    </marker>
-  );
-}
-
-function JourneyFigure(props: {
-  ordinal: string;
-  /** viewBox size; also set as intrinsic width/height so `width:100%;
-   * height:auto` keeps the aspect ratio inside the scroll container */
-  w: number;
-  h: number;
-  label: string;
-  caption: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <figure className="jg-figure">
-      <div className="jg-plate">
-        <svg
-          viewBox={`0 0 ${props.w} ${props.h}`}
-          width={props.w}
-          height={props.h}
-          role="img"
-          aria-label={props.label}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {props.children}
-        </svg>
-      </div>
-      <figcaption className="jg-caption">
-        <span className="jg-fig">Fig. {props.ordinal}</span>
-        {props.caption}
-      </figcaption>
-    </figure>
-  );
-}
-
 /**
  * ML-Driven Marketing Campaigns — the A/B loop marketers used to run by
  * hand (split at random, watch conversion, re-weight the branches),
@@ -116,7 +54,7 @@ function JourneyFigure(props: {
  */
 export function MlBranchFigure(props: { ordinal: string }) {
   return (
-    <JourneyFigure
+    <ExhibitFigure
       ordinal={props.ordinal}
       w={880}
       h={290}
@@ -124,7 +62,7 @@ export function MlBranchFigure(props: { ordinal: string }) {
       caption="Marketers used to run this loop by hand: split at random, watch which email-and-offer combination converted, re-weight the branches. The ML node closed the loop — attribution feeds allocation, and the winning variant earns the traffic."
     >
       <defs>
-        <Arrow id="ml-arr" />
+        <ArrowMarker id="ml-arr" />
       </defs>
 
       <Edge d="M 184 130 H 306" marker="ml-arr" />
@@ -138,21 +76,21 @@ export function MlBranchFigure(props: { ordinal: string }) {
         marker="ml-arr"
       />
 
-      <text className="jg-edge-label" x={640} y={50} textAnchor="end">
+      <text className="ex-edge-label" x={640} y={50} textAnchor="end">
         82%
       </text>
-      <text className="jg-edge-label" x={640} y={216} textAnchor="end">
+      <text className="ex-edge-label" x={640} y={216} textAnchor="end">
         18%
       </text>
-      <text className="jg-note" x={560} y={274}>
+      <text className="ex-note" x={560} y={274}>
         conversion attribution
       </text>
 
       {/* rendered before the nodes so the token ducks under each step while
           it dwells there, and only surfaces while traveling the edges */}
-      <g className="jg-token">
-        <circle className="jg-token-halo" r={9} />
-        <circle className="jg-token-core" r={4.5} />
+      <g className="ex-token">
+        <circle className="ex-token-halo" r={9} />
+        <circle className="ex-token-core" r={4.5} />
         <animateMotion
           dur="8s"
           repeatCount="indefinite"
@@ -203,7 +141,7 @@ export function MlBranchFigure(props: { ordinal: string }) {
         title="Email B · trial"
         sub="cvr 1.9%"
       />
-    </JourneyFigure>
+    </ExhibitFigure>
   );
 }
 
@@ -214,7 +152,7 @@ export function MlBranchFigure(props: { ordinal: string }) {
  */
 export function PromoDagFigure(props: { ordinal: string }) {
   return (
-    <JourneyFigure
+    <ExhibitFigure
       ordinal={props.ordinal}
       w={880}
       h={260}
@@ -222,8 +160,8 @@ export function PromoDagFigure(props: { ordinal: string }) {
       caption="One promotion, two prerequisites, one customer mid-journey. Events complete independently and merge back into the gate; the credit stays held until both land."
     >
       <defs>
-        <Arrow id="dg-arr" />
-        <Arrow id="dg-arr-ok" ok />
+        <ArrowMarker id="dg-arr" />
+        <ArrowMarker id="dg-arr-ok" ok />
       </defs>
 
       <Edge d="M 158 130 C 196 130, 208 58, 246 58" marker="dg-arr" />
@@ -284,9 +222,9 @@ export function PromoDagFigure(props: { ordinal: string }) {
         pending
       />
 
-      <text className="jg-note" x={604} y={222}>
+      <text className="ex-note" x={604} y={222}>
         two edges in, one gate — a tree can’t do that
       </text>
-    </JourneyFigure>
+    </ExhibitFigure>
   );
 }

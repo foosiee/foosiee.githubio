@@ -33,8 +33,9 @@ export interface ProjectWriteup {
   note?: string;
 }
 
-/** Inline SVG exhibit rendered inside the expanded detail (journeyGraph.tsx). */
-export type ProjectDiagram = 'ml-branch' | 'promo-dag';
+/** Inline SVG exhibit rendered inside the expanded detail
+ * (journeyGraph.tsx, accessQueryFigure.tsx). */
+export type ProjectDiagram = 'ml-branch' | 'promo-dag' | 'access-query';
 
 export interface FeaturedProject {
   id: string;
@@ -80,8 +81,9 @@ export const WORK: FeaturedProject[] = [
     kind: 'case',
     blurb:
       'Turned Cedar partial-evaluation residuals into indexed lookups so apps can ask "what can Alice see?", not just "can Alice see X?".',
-    tags: ['Cedar', 'DynamoDB', 'Valkey', 'Lambda'],
+    tags: ['Cedar', 'Valkey', 'Lambda'],
     era: '2025–2026',
+    diagram: 'access-query',
     writeup: {
       problem:
         'Point authorization answers "can Alice view document X?". Several internal apps needed the inverse, "what documents can Alice view?", across a whole dataset, which a per-entity check can’t answer at scale.',

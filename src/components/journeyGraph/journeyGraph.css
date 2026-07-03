@@ -1,49 +1,5 @@
-/* Journey-graph exhibits for the Everest entries — an instrument reading of
-   the workflow canvas marketers composed in. Pure SVG on a graph-paper well;
-   every color routes through the .v-noir tokens so both themes read.
-   Cobalt appears only as the moving customer token (the One Signal Rule). */
-
-.jg-figure {
-  grid-column: 1 / -1;
-  /* grid items default to min-width:auto — without this the svg's min-width
-     would stretch the page instead of scrolling inside the plate */
-  min-width: 0;
-  margin: 10px 0 0;
-}
-.jg-plate {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background-color: var(--sunken);
-  /* the campaign canvas: a faint dot grid, same hairline color as the frame */
-  background-image: radial-gradient(var(--line) 1px, transparent 1.6px);
-  background-size: 24px 24px;
-  padding: 18px 18px 12px;
-}
-.jg-plate svg {
-  display: block;
-  width: 100%;
-  /* below this the labels stop being legible — scroll instead of shrink */
-  min-width: 700px;
-  height: auto;
-}
-.jg-caption {
-  margin: 12px 0 0;
-  max-width: 74ch;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: var(--t-meta);
-  line-height: 1.55;
-  color: var(--soft);
-  text-wrap: pretty;
-}
-.jg-fig {
-  margin-right: 10px;
-  font-size: var(--t-label);
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--violet);
-}
+/* Journey-graph node shapes for the Everest exhibits. The shared plate,
+   caption, edge, and token vocabulary lives in components/exhibits. */
 
 /* nodes — raised sheets on the sunken canvas; pending ones haven't
    materialized yet, so they're outline-only and dashed */
@@ -58,12 +14,6 @@
 .jg-node-pending .jg-title {
   fill: var(--soft);
 }
-.jg-kind {
-  font: 500 9px 'JetBrains Mono', ui-monospace, monospace;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  fill: var(--violet);
-}
 .jg-title {
   font: 700 15px 'Archivo', system-ui, sans-serif;
   letter-spacing: -0.01em;
@@ -75,59 +25,4 @@
 }
 .jg-sub-ok {
   fill: var(--ok);
-}
-
-/* edges */
-.jg-edge {
-  fill: none;
-  stroke: var(--comment);
-  stroke-width: 1.5;
-}
-.jg-edge-done {
-  stroke: var(--ok);
-}
-.jg-edge-pending {
-  stroke-dasharray: 4 4;
-  animation: jg-ants 1.4s linear infinite;
-}
-@keyframes jg-ants {
-  to {
-    stroke-dashoffset: -16;
-  }
-}
-.jg-arr {
-  fill: var(--comment);
-}
-.jg-arr-ok {
-  fill: var(--ok);
-}
-.jg-edge-label {
-  font: 500 9.5px 'JetBrains Mono', ui-monospace, monospace;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  fill: var(--soft);
-}
-.jg-note {
-  font: 500 10.5px 'JetBrains Mono', ui-monospace, monospace;
-  fill: var(--comment);
-  text-anchor: middle;
-}
-
-/* the live customer token — the one cobalt element in the exhibit */
-.jg-token-core {
-  fill: var(--acc);
-}
-.jg-token-halo {
-  fill: var(--acc);
-  opacity: 0.18;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* SMIL isn't covered by the global animation:none — remove the token */
-  .jg-token {
-    display: none;
-  }
-  .jg-edge-pending {
-    animation: none;
-  }
 }
