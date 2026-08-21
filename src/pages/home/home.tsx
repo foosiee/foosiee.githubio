@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './home.css';
 import { EXPERIENCE, WORK, PROFILE, SKILLS } from './content';
 import type { ExperienceEntry, FeaturedProject } from './content';
@@ -8,6 +8,7 @@ import {
   PromoDagFigure,
 } from '../../components/journeyGraph/journeyGraph';
 import { AccessQueryFigure } from '../../components/accessQuery/accessQueryFigure';
+import { capture } from '../../lib/analytics';
 
 type Theme = 'light' | 'dark';
 
@@ -34,6 +35,23 @@ export default function Home() {
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const toggle = (id: string) => setOpenId((cur) => (cur === id ? null : id));
 
+  // When the demo drawer opened, so closing it can report time spent in it —
+  // the difference between a glance and a real read.
+  const demoOpenedAt = useRef(0);
+
+  const openDemo = () => {
+    demoOpenedAt.current = Date.now();
+    capture('cedar_demo_opened');
+    setDemoOpen(true);
+  };
+
+  const closeDemo = () => {
+    capture('cedar_demo_closed', {
+      seconds_open: Math.round((Date.now() - demoOpenedAt.current) / 1000),
+    });
+    setDemoOpen(false);
+  };
+
   // Reflect the theme on <html> (the inline script in index.html set it
   // pre-paint; this keeps it in sync on toggle) and remember the choice.
   useEffect(() => {
@@ -54,7 +72,13 @@ export default function Home() {
             <button
               type="button"
               className="nr-theme-toggle"
-              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              onClick={() =>
+                setTheme((t) => {
+                  const next = t === 'dark' ? 'light' : 'dark';
+                  capture('theme_toggled', { to: next });
+                  return next;
+                })
+              }
               aria-label={`Switch to ${
                 theme === 'dark' ? 'light' : 'dark'
               } theme`}
@@ -69,16 +93,36 @@ export default function Home() {
               {PROFILE.company}
             </p>
             <nav className="nr-links">
-              <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+              <a
+                href={PROFILE.links.resume}
+                target="_blank"
+                rel="noreferrer"
+                onClick={outbound('resume', 'header')}
+              >
                 Résumé
               </a>
-              <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
+              <a
+                href={PROFILE.links.github}
+                target="_blank"
+                rel="noreferrer"
+                onClick={outbound('github', 'header')}
+              >
                 GitHub
               </a>
-              <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
+              <a
+                href={PROFILE.links.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                onClick={outbound('linkedin', 'header')}
+              >
                 LinkedIn
               </a>
-              <a href={`mailto:${PROFILE.links.email}`}>Email</a>
+              <a
+                href={`mailto:${PROFILE.links.email}`}
+                onClick={outbound('email', 'header')}
+              >
+                Email
+              </a>
             </nav>
           </div>
         </header>
@@ -102,7 +146,12 @@ export default function Home() {
                 key={e.id}
                 entry={e}
                 open={openId === e.id}
-                onToggle={() => toggle(e.id)}
+                onToggle={() => {
+                  if (openId !== e.id) {
+                    capture('experience_expanded', { org: e.org });
+                  }
+                  toggle(e.id);
+                }}
               />
             ))}
           </ol>
@@ -140,8 +189,16 @@ export default function Home() {
                   project={p}
                   index={i}
                   open={openId === p.id}
-                  onToggle={() => toggle(p.id)}
-                  onRunDemo={() => setDemoOpen(true)}
+                  onToggle={() => {
+                    if (openId !== p.id) {
+                      capture('project_expanded', {
+                        project: p.id,
+                        kind: p.kind,
+                      });
+                    }
+                    toggle(p.id);
+                  }}
+                  onRunDemo={openDemo}
                   style={delay(3 + i)}
                 />
               ))}
@@ -153,7 +210,10 @@ export default function Home() {
           <div>
             <h3>Reach</h3>
             <p className="nr-reach">
-              <a href={`mailto:${PROFILE.links.email}`}>
+              <a
+                href={`mailto:${PROFILE.links.email}`}
+                onClick={outbound('email', 'colophon')}
+              >
                 {PROFILE.links.email}
               </a>
             </p>
@@ -164,21 +224,42 @@ export default function Home() {
           </div>
           <div className="nr-colophon-links">
             <h3>Elsewhere</h3>
-            <a href={PROFILE.links.github} target="_blank" rel="noreferrer">
+            <a
+              href={PROFILE.links.github}
+              target="_blank"
+              rel="noreferrer"
+              onClick={outbound('github', 'colophon')}
+            >
               github.com/foosiee
             </a>
-            <a href={PROFILE.links.linkedin} target="_blank" rel="noreferrer">
+            <a
+              href={PROFILE.links.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              onClick={outbound('linkedin', 'colophon')}
+            >
               linkedin.com/in/colefoos
             </a>
-            <a href={PROFILE.links.resume} target="_blank" rel="noreferrer">
+            <a
+              href={PROFILE.links.resume}
+              target="_blank"
+              rel="noreferrer"
+              onClick={outbound('resume', 'colophon')}
+            >
               résumé (PDF)
             </a>
           </div>
         </footer>
       </div>
-      <DemoDrawer open={demoOpen} onClose={() => setDemoOpen(false)} />
+      <DemoDrawer open={demoOpen} onClose={closeDemo} />
     </div>
   );
+}
+
+/** onClick for the résumé / GitHub / LinkedIn / email links — the ones that
+ * mean a visitor is following up rather than browsing. */
+function outbound(target: string, location: 'header' | 'colophon') {
+  return () => capture('outbound_link_clicked', { target, location });
 }
 
 /** Sequential figure numbers ("01", "02", …) for diagram-bearing projects,

@@ -5,6 +5,7 @@ import {
   getCedarDiagnostics,
   getCedarHover,
 } from './cedarLsp';
+import { capture, captureOnce } from './analytics';
 
 type CedarContext = {
   getSchemaText: () => string;
@@ -60,6 +61,13 @@ export function registerCedarEditorService(
         wordRange,
       });
 
+      // Proof the language server actually served something, not just that
+      // the editor rendered. Once per document kind — completions fire on
+      // nearly every keystroke.
+      if (suggestions.length > 0) {
+        captureOnce('cedar_lsp_completions_served', { kind }, kind);
+      }
+
       return { suggestions };
     },
   });
@@ -70,11 +78,17 @@ export function registerCedarEditorService(
         return null;
       }
 
-      return getCedarHover({
+      const hover = await getCedarHover({
         text: model.getValue(),
         schemaText: context.getSchemaText(),
         position,
       });
+
+      if (hover) {
+        captureOnce('cedar_lsp_hover_served');
+      }
+
+      return hover;
     },
   });
 }
@@ -98,6 +112,11 @@ export async function updateCedarDiagnostics(
     });
 
     monaco.editor.setModelMarkers(model, 'cedar-language-server', markers);
+
+    // A visitor who wrote a policy the LSP flagged got the real experience.
+    if (markers.length > 0) {
+      captureOnce('cedar_lsp_diagnostics_shown', { kind }, kind);
+    }
   } catch (error) {
     monaco.editor.setModelMarkers(model, 'cedar-language-server', [
       {
@@ -113,5 +132,10 @@ export async function updateCedarDiagnostics(
         source: 'cedar-language-server',
       },
     ]);
+
+    capture('cedar_lsp_failed', {
+      kind,
+      message: error instanceof Error ? error.message : 'unknown',
+    });
   }
 }

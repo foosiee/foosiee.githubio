@@ -14,6 +14,7 @@ import {
   registerCedarEditorService,
   updateCedarDiagnostics,
 } from '../../lib/cedarEditorService';
+import { capture, captureOnce } from '../../lib/analytics';
 import './cedarDemo.css';
 
 type CedarModule = typeof import('@cedar-policy/cedar-wasm');
@@ -223,6 +224,43 @@ export default function CedarDemo() {
   const [runtimeVersion, setRuntimeVersion] = useState<string | null>(null);
   const [sdkVersion, setSdkVersion] = useState<string | null>(null);
 
+  // Engagement depth. Keystrokes are far too noisy to send individually, so
+  // they're tallied here and reported once when the demo unmounts; the first
+  // edit of each document fires its own event.
+  const editCount = useRef(0);
+  const editedDocuments = useRef(new Set<CedarDocumentId>());
+
+  const onDocumentEdited = (id: CedarDocumentId) => {
+    editCount.current += 1;
+    editedDocuments.current.add(id);
+    captureOnce('cedar_lsp_edited', { document: id }, id);
+  };
+
+  useEffect(() => {
+    let sent = false;
+
+    // Also flush on pagehide: React never runs cleanup when the visitor just
+    // closes the tab, which is exactly how an engaged session tends to end.
+    const flush = () => {
+      if (sent) {
+        return;
+      }
+
+      sent = true;
+      capture('cedar_demo_engagement', {
+        edits: editCount.current,
+        documents_edited: editedDocuments.current.size,
+      });
+    };
+
+    window.addEventListener('pagehide', flush);
+
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      flush();
+    };
+  }, []);
+
   const analyzeInputs = (
     module: CedarModule,
     nextSchemaText: string,
@@ -256,6 +294,7 @@ export default function CedarDemo() {
 
   useEffect(() => {
     let active = true;
+    const startedAt = Date.now();
 
     import('@cedar-policy/cedar-wasm')
       .then((module) => {
@@ -267,6 +306,10 @@ export default function CedarDemo() {
         setRuntimeVersion(module.getCedarVersion());
         setSdkVersion(module.getCedarSDKVersion());
         analyzeInputs(module, SAMPLE_SCHEMA, SAMPLE_POLICIES);
+        capture('cedar_runtime_loaded', {
+          ms: Date.now() - startedAt,
+          cedar_version: module.getCedarVersion(),
+        });
       })
       .catch((error: unknown) => {
         if (!active) {
@@ -276,6 +319,7 @@ export default function CedarDemo() {
         const message =
           error instanceof Error ? error.message : 'Failed to load Cedar WASM.';
         setLoadError(message);
+        capture('cedar_runtime_load_failed', { message });
       });
 
     return () => {
@@ -349,6 +393,8 @@ export default function CedarDemo() {
       indentWidth: 2,
     });
 
+    capture('cedar_policies_formatted', { result: result.type });
+
     if (result.type === 'success') {
       setPolicyText(result.formatted_policy);
       analyzeInputs(cedar, schemaText, result.formatted_policy);
@@ -359,6 +405,7 @@ export default function CedarDemo() {
   };
 
   const resetSamples = () => {
+    capture('cedar_samples_reset');
     setSchemaText(SAMPLE_SCHEMA);
     setPolicyText(SAMPLE_POLICIES);
 
@@ -398,7 +445,10 @@ export default function CedarDemo() {
       language: 'cedar' as const,
       path: 'cedar://workspace/schema.cedar',
       value: schemaText,
-      onChange: setSchemaText,
+      onChange: (value: string) => {
+        onDocumentEdited('schema');
+        setSchemaText(value);
+      },
       help: 'Define entity types, actions, and relationships.',
       canHover: false,
     },
@@ -407,7 +457,10 @@ export default function CedarDemo() {
       language: 'cedar' as const,
       path: 'cedar://workspace/policies.cedar',
       value: policyText,
-      onChange: setPolicyText,
+      onChange: (value: string) => {
+        onDocumentEdited('policies');
+        setPolicyText(value);
+      },
       help: 'Hover and autocomplete are wired here through the Cedar LSP.',
       canHover: true,
     },
@@ -416,7 +469,10 @@ export default function CedarDemo() {
       language: 'json' as const,
       path: 'cedar://workspace/entities.json',
       value: entitiesText,
-      onChange: setEntitiesText,
+      onChange: (value: string) => {
+        onDocumentEdited('entities');
+        setEntitiesText(value);
+      },
       help: 'Entity graph used by the authorization runtime.',
       canHover: false,
     },
@@ -425,7 +481,10 @@ export default function CedarDemo() {
       language: 'json' as const,
       path: 'cedar://workspace/request.json',
       value: requestText,
-      onChange: setRequestText,
+      onChange: (value: string) => {
+        onDocumentEdited('request');
+        setRequestText(value);
+      },
       help: 'Principal, action, resource, and context for evaluation.',
       canHover: false,
     },
@@ -465,20 +524,27 @@ export default function CedarDemo() {
                 };
 
                 setAuthorizationErrors([]);
-                setAuthorization(
-                  cedar.isAuthorized({
-                    schema: schemaText,
-                    policies: { staticPolicies: policyText },
-                    entities: parsedEntities,
-                    principal: parsedRequest.principal,
-                    action: parsedRequest.action,
-                    resource: parsedRequest.resource,
-                    context: (parsedRequest.context ?? {}) as Parameters<
-                      typeof cedar.isAuthorized
-                    >[0]['context'],
-                    validateRequest: true,
-                  })
-                );
+
+                const answer = cedar.isAuthorized({
+                  schema: schemaText,
+                  policies: { staticPolicies: policyText },
+                  entities: parsedEntities,
+                  principal: parsedRequest.principal,
+                  action: parsedRequest.action,
+                  resource: parsedRequest.resource,
+                  context: (parsedRequest.context ?? {}) as Parameters<
+                    typeof cedar.isAuthorized
+                  >[0]['context'],
+                  validateRequest: true,
+                });
+
+                setAuthorization(answer);
+                capture('cedar_authorize_run', {
+                  outcome: answer.type,
+                  decision:
+                    answer.type === 'success' ? answer.response.decision : null,
+                  edited: editCount.current > 0,
+                });
               } catch (error) {
                 setAuthorization(null);
                 setAuthorizationErrors(
@@ -487,6 +553,7 @@ export default function CedarDemo() {
                     error instanceof Error ? error.message : null
                   )
                 );
+                capture('cedar_authorize_run', { outcome: 'input_error' });
               }
             }}
           >
@@ -534,7 +601,10 @@ export default function CedarDemo() {
               role="tab"
               aria-selected={activeDocument === id}
               className={`cedar-tab${activeDocument === id ? ' active' : ''}`}
-              onClick={() => setActiveDocument(id)}
+              onClick={() => {
+                capture('cedar_document_opened', { document: id });
+                setActiveDocument(id);
+              }}
             >
               {cedarDocuments[id].label}
             </button>
